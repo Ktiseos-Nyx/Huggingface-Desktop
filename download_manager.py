@@ -1,4 +1,3 @@
-# hf_backup_tool/downloads/download_manager.py
 import logging
 import os
 import subprocess
