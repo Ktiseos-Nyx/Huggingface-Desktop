@@ -1,6 +1,7 @@
 # Hugging Face Backup Tool
 
 A user-friendly desktop application for backing up your Hugging Face models, datasets, and spaces.
+<img width="803" alt="Screenshot 2025-05-06 at 11 28 13" src="https://github.com/user-attachments/assets/aaad7468-3fa3-4c68-93c1-21b2cf09ff8e" />
 
 ## Overview
 
