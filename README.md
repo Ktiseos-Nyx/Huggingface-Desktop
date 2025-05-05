@@ -1,6 +1,6 @@
 # Hugging Face Backup Tool
 
-A user-friendly desktop application for backing up your Hugging Face models, datasets, and spaces.
+A user-friendly desktop application for backing up your Hugging Face models, datasets, and spaces. This is in progress so some things may not be working 100% quite yet.
 <img width="803" alt="Screenshot 2025-05-06 at 11 28 13" src="https://github.com/user-attachments/assets/aaad7468-3fa3-4c68-93c1-21b2cf09ff8e" />
 
 ## Overview
@@ -34,7 +34,7 @@ This tool is built using PyQt6, which is a cross-platform GUI framework. Therefo
 *   **macOS:** macOS 10.14 (Mojave) or later
 *   **Linux:** Most modern Linux distributions (e.g., Ubuntu, Fedora, Debian)
 
-**Note:** While the tool *should* work on these operating systems, it has only been tested on [Your Primary OS]. Your experience may vary. Please report any compatibility issues you encounter.
+**Note:** While the tool *should* work on these operating systems, it has only been tested on [MacOS Ventura 13.5.1]. Your experience may vary. Please report any compatibility issues you encounter.
 
 ### Installation with UV (Recommended)
 
