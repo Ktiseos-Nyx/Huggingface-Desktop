@@ -1,62 +1,73 @@
-# Configuration file for MegaLinter
-# See all available variables at https://megalinter.io/configuration/ and in linters documentation
+# .mega-linter.yml
 
-APPLY_FIXES: all
-# ENABLE: # If you use ENABLE variable, all other languages/formats/tooling formats will be disabled by default
-ENABLE_LINTERS: pylint, flake8, markdownlint, remark-lint, markdown-link-check, markdown-table-formatter, yamllint, prettier, bandit
+APPLY_FIXES:  # Enable auto-fixes for safe linters
+  - PYTHON_BLACK
+  - PYTHON_ISORT
+  - YAML_PRETTIER
+
+#ENABLE: # Use DISABLE and selectively ENABLE, see below
 DISABLE:
-  - CLOUDFORMATION
-  - COPYPASTE # Uncomment to disable checks of excessive copy-pastes
-  - CSS
-  - EDITORCONFIG
-  # - SPELL # Uncomment to disable checks of spelling mistakes
-  - JAVASCRIPT
-  - TEKTON
-DISABLE_LINTERS:
-  - JSON_PRETTIER
-  - MARKDOWN_MARKDOWN_LINK_CHECK
-  - PYTHON_PYRIGHT
-  - REPOSITORY_GITLEAKS
-  - REPOSITORY_KICS
-  - SPELL_PROSELINT
-  - SPELL_MISSPELL
-  - SPELL_VALE
-DISABLE_ERRORS_LINTERS:
-  - REPOSITORY_DEVSKIM
-  - REPOSITORY_GRYPE
-  - REPOSITORY_SEMGREP
-  - SPELL_LYCHEE
-PRINT_ALL_FILES: false
-FILTER_REGEX_EXCLUDE: '(\.automation/test|\.automation/generated|\.venv|\.github/workflows|docs/javascripts|docs/overrides|docs/json-schemas|flavors|clj-kondo|TEMPLATES)'
-JSON_JSONLINT_FILTER_REGEX_EXCLUDE: '(\.vscode/)'
-YAML_YAMLLINT_FILTER_REGEX_EXCLUDE: '(templates/\.mega-linter\.yml)'
-YAML_PRETTIER_FILTER_REGEX_EXCLUDE: '(templates/\.mega-linter\.yml|mkdocs\.yml)'
-YAML_V8R_FILTER_REGEX_EXCLUDE: '(descriptors|templates/\.mega-linter\.yml|\.codecov\.yml)'
-BASH_FILTER_REGEX_EXCLUDE: "(lib)"
-MARKDOWN_FILTER_REGEX_EXCLUDE: '(license\.md|docs/licenses)'
-MARKDOWN_MARKDOWN_LINK_CHECK_DISABLE_ERRORS: true
-SPELL_VALE_FILE_EXTENSIONS:
-  - .md
-SPELL_FILTER_REGEX_EXCLUDE: (valestyles|\.github|docs/licenses)
-DOCKERFILE_HADOLINT_ARGUMENTS: "--ignore DL3003 --ignore DL3007 --ignore DL3013 --ignore DL3016 --ignore DL3018 --ignore DL3028 --ignore DL3059 --ignore DL4001 --ignore DL4006 --ignore SC2015 --ignore SC2016 --ignore SC2039 --ignore SC2086 --ignore SC1091 --ignore SC3046"
-REPOSITORY_TRIVY_ARGUMENTS:
-  - "--skip-dirs"
-  - ".automation/test"
-  - "--skip-dirs"
-  - ".venv"
-REPOSITORY_TRUFFLEHOG_ARGUMENTS:
-  - --exclude-paths=.trufflehogignore
-SHOW_ELAPSED_TIME: true
-FLAVOR_SUGGESTIONS: false
-EMAIL_REPORTER: false
-FILEIO_REPORTER: false
-JSON_REPORTER: true
-GITHUB_STATUS_REPORTER: false
-PLUGINS:
-  - https://raw.githubusercontent.com/oxsecurity/megalinter/main/.automation/test/mega-linter-plugin-test/test.megalinter-descriptor.yml
-PRE_COMMANDS:
-  - command: echo "This is MegaLinter PRE_COMMAND on own MegaLinter ! :)"
-    cwd: "root"
-POST_COMMANDS:
-  - command: echo "This is MegaLinter POST_COMMAND on own MegaLinter ! :)"
-    cwd: "workspace"
+  - ALL  # Disable everything by default, then selectively enable
+#Core Functionality
+ENABLE:
+  - PYTHON
+  - YAML
+  - INI # Needed for config.ini
+
+#Optional Functionality -- Review before enabling
+#  - MARKDOWN # if you have markdown documentation
+
+# Security Linting (Critical)
+ENABLE_LINTERS:
+  - PYTHON_BANDIT       # Security vulnerability scanner for Python
+  - REPOSITORY_TRUFFLEHOG # High signal secrets scanner
+#  - REPOSITORY_SEMGREP   # Pattern-based security scanner (requires configuration) - Enable once configured
+
+# Python Linters - Style and Quality
+ENABLE_LINTERS:
+  - PYTHON_FLAKE8  # Style and error checker
+  - PYTHON_BLACK  # Automatic code formatter (opinionated)
+  - PYTHON_ISORT   # Import sorting
+#  - PYTHON_MYPY    # Static type checker (requires type hints) - Consider enabling if you add type hints
+#  - PYTHON_PYLINT  # More comprehensive linter (can be noisy)
+
+# YAML Linters
+ENABLE_LINTERS:
+  - YAML_YAMLLINT # YAML Linter
+  - YAML_PRETTIER # YAML Formatter
+
+# INI Linter (for config.ini)
+ENABLE_LINTERS:
+  - INI_CFGPARSE
+
+FILTER_REGEX_EXCLUDE: |
+  (
+    \.automation/test|
+    \.automation/generated|
+    \.venv|
+    \.github/workflows|
+    __pycache__|
+    build|
+    dist|
+    \.mypy_cache|
+    \.pytest_cache|
+    htmlcov
+  )
+
+PYTHON_FLAKE8_ARGUMENTS: "--max-line-length=120 --ignore=E203,W503"
+PYTHON_BLACK_LINE_LENGTH: 120 # Ensure flake8, black, and isort stay in sync!
+PYTHON_ISORT_ARGS: "--profile black" #Ensure flake8, black, and isort stay in sync!
+INI_CFGPARSE_ARGUMENTS: "--no-duplicate-sections" #Example to help manage config.ini
+
+# Specific Exclusions (adjust paths as needed)
+# For example, if you have automatically generated UI code:
+# PYTHON_FLAKE8_FILTER_REGEX_EXCLUDE: (path/to/generated_file\.py)
+
+# GitHub Feedback Mechanisms (The "fun stuff")
+GITHUB_STATUS_REPORTER: true  # Enable status checks on pull requests
+GITHUB_PR_COMMENT_REPORTER: true # Enable comments on pull requests. Use review reporter instead.
+GITHUB_PR_REVIEW_REPORTER: true # Use the review reporter if you want a pull request review instead of comments
+
+# Reporter settings (adjust as needed)
+FILEIO_REPORTER: false  # Usually disabled in CI/CD
+JSON_REPORTER: true  # Keep this for generating a JSON report (useful for other tools)
