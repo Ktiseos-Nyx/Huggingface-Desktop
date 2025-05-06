@@ -1,5 +1,6 @@
 # hf_backup_tool/exceptions/custom_exceptions.py
 # Custom exception classes for the Hugging Face Backup Tool.
+# If you see immature comments, i'm just testing the linter - I have lost the plot but i'm not literally damaging my repo D:
 
 class APIKeyError(Exception):
     """
