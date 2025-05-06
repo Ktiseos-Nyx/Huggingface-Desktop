@@ -10,7 +10,7 @@ Ktiseos Nyx is a refuge for those who value community, where the foundations we 
 
 Our commitment to this vision extends to the very core of our process:
 
-*   **Open and Collaborative:** Code within Ktiseos Nyx is a shared resource, a living testament to collaboration. We embrace diverse approaches to development, including the responsible use of advanced tools like Large Language Models. Our projects are generally licensed under the [GNU GPL v3.0 License](LICENSE), chosen for its copyleft provisions to encourage broad collaboration and reuse.
+*   **Open and Collaborative:** Code within Ktiseos Nyx is a shared resource, a living testament to collaboration. We embrace diverse approaches to development, including the responsible use of advanced tools like Large Language Models. Our projects are generally licensed under the [GNU GPL v3.0 License](https://github.com/Ktiseos-Nyx/Huggingface-Desktop?tab=GPL-3.0-1-ov-file#readme), chosen for its copyleft provisions to encourage broad collaboration and reuse.
 *   **Security Conscious:** We rigorously vet the packages and dependencies we use, prioritizing security and stability. While striving for user-friendliness in all our tools, we also challenge ourselves to anticipate future needs, both niche and widespread. We are committed to addressing security vulnerabilities promptly and transparently.
 *   **Community Driven:** We operate transparently, with key decisions made collaboratively. We welcome contributions from everyone, regardless of skill level. Join the discussion on our [Discord Server](https://discord.gg/HhBSvM9gBY)!
 *   **Respectful and Inclusive:** We are committed to maintaining a welcoming and inclusive environment for all contributors.
