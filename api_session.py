@@ -4,7 +4,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 from .config_manager import config
-
+# test the LINTER
 logger = logging.getLogger(__name__)
 
 
