@@ -3,8 +3,16 @@ import os
 import shutil
 import zipfile
 
-from PyQt6.QtWidgets import (QWidget, QLabel, QLineEdit, QPushButton,
-                             QVBoxLayout, QHBoxLayout, QFileDialog, QTextEdit)
+from PyQt6.QtWidgets import (
+    QWidget,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QVBoxLayout,
+    QHBoxLayout,
+    QFileDialog,
+    QTextEdit,
+)
 
 from config_manager import config
 
@@ -24,7 +32,9 @@ class ZipApp(QWidget):
         self.folder_input = QLineEdit()
         self.folder_button = QPushButton("Select Folder")
         self.zip_name_label = QLabel("Zip Name:")
-        self.zip_name_input = QLineEdit(config['Zip']['default_zip_name'])  # From config
+        self.zip_name_input = QLineEdit(
+            config["Zip"]["default_zip_name"]
+        )  # From config
         self.zip_button = QPushButton("Zip and Save")
         self.output_text = QTextEdit()
         self.output_text.setReadOnly(True)
@@ -65,17 +75,19 @@ class ZipApp(QWidget):
             self.output_text.append("Please enter a zip file name.")
             return
         if not os.path.isdir(folder_path):
-            self.output_text.append("Invalid folder path. Please provide a valid directory")
+            self.output_text.append(
+                "Invalid folder path. Please provide a valid directory"
+            )
             return
 
-        zip_file_path = zip_file_name + '.zip'
+        zip_file_path = zip_file_name + ".zip"
 
         try:
             temp_dir = "temp_zip_dir"
             os.makedirs(temp_dir, exist_ok=True)
             temp_zip_path = os.path.join(temp_dir, zip_file_path)
 
-            with zipfile.ZipFile(temp_zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            with zipfile.ZipFile(temp_zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
                 for root, _, files in os.walk(folder_path):
                     for file in files:
                         file_path = os.path.join(root, file)
@@ -83,11 +95,15 @@ class ZipApp(QWidget):
                         zipf.write(file_path, relative_path)
 
             # Get the directory to save the zip file to
-            save_path, _ = QFileDialog.getSaveFileName(self, "Save Zip File", zip_file_path, "Zip files (*.zip)")
+            save_path, _ = QFileDialog.getSaveFileName(
+                self, "Save Zip File", zip_file_path, "Zip files (*.zip)"
+            )
 
             if save_path:
                 shutil.copy2(temp_zip_path, save_path)
-                self.output_text.append(f"Successfully created and saved {zip_file_path} to {save_path}")
+                self.output_text.append(
+                    f"Successfully created and saved {zip_file_path} to {save_path}"
+                )
             else:
                 self.output_text.append("Zip file creation cancelled.")
 

@@ -5,6 +5,7 @@ logger = logging.getLogger(__name__)
 
 KEYRING_SERVICE_NAME = "huggingface_backup"  # Consistent service name
 
+
 def get_api_token(alias):
     """Retrieves the API token from the system keyring."""
     try:
@@ -16,7 +17,9 @@ def get_api_token(alias):
             logger.warning(f"No API token found for alias: {alias}")
             return None
     except Exception as e:
-        logger.error(f"Error retrieving API token for alias {alias}: {e}", exc_info=True)
+        logger.error(
+            f"Error retrieving API token for alias {alias}: {e}", exc_info=True
+        )
         return None
 
 

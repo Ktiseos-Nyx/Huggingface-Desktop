@@ -1,6 +1,14 @@
 import logging
-from PyQt6.QtWidgets import (QWidget, QLabel, QLineEdit, QPushButton,
-                             QVBoxLayout, QHBoxLayout, QCheckBox, QMessageBox)
+from PyQt6.QtWidgets import (
+    QWidget,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QVBoxLayout,
+    QHBoxLayout,
+    QCheckBox,
+    QMessageBox,
+)
 from PyQt6.QtCore import Qt
 from custom_exceptions import ConfigError  # Import ConfigError
 from config_manager import config, save_config
@@ -11,13 +19,13 @@ logger = logging.getLogger(__name__)
 
 def obfuscate_token(token):
     """A simple obfuscation function (DO NOT RELY ON THIS FOR SECURITY)."""
-    obfuscated = ''.join([chr(ord(c) + 5) for c in token])  # Shift each character by 5
+    obfuscated = "".join([chr(ord(c) + 5) for c in token])  # Shift each character by 5
     return obfuscated
 
 
 def deobfuscate_token(obfuscated):
     """Reverses the obfuscation (DO NOT RELY ON THIS FOR SECURITY)."""
-    original = ''.join([chr(ord(c) - 5) for c in obfuscated])
+    original = "".join([chr(ord(c) - 5) for c in obfuscated])
     return original
 
 
@@ -31,17 +39,17 @@ class ConfigDialog(QWidget):
         # --- API Token Section ---
         self.api_token_label = QLabel("Hugging Face API Token:")
         self.api_token_input = QLineEdit()  # No default
-        self.api_token_input.setEchoMode(QLineEdit.Password)  # Mask the token
+        self.api_token_input.setEchoMode(QLineEdit.EchoMode.Password)  # Mask the token
 
         # --- Proxy Section ---
         self.use_proxy_checkbox = QCheckBox("Use Proxy")
-        self.use_proxy_checkbox.setChecked(config.getboolean('Proxy', 'use_proxy'))
+        self.use_proxy_checkbox.setChecked(config.getboolean("Proxy", "use_proxy"))
         self.http_proxy_label = QLabel("HTTP Proxy:")
-        self.http_proxy_input = QLineEdit(config['Proxy']['http'])
+        self.http_proxy_input = QLineEdit(config["Proxy"]["http"])
         self.https_proxy_label = QLabel("HTTPS Proxy:")
-        self.https_proxy_input = QLineEdit(config['Proxy']['https'])
+        self.https_proxy_input = QLineEdit(config["Proxy"]["https"])
         self.rate_limit_label = QLabel("Rate Limit Delay (seconds):")
-        self.rate_limit_input = QLineEdit(config['HuggingFace']['rate_limit_delay'])
+        self.rate_limit_input = QLineEdit(config["HuggingFace"]["rate_limit_delay"])
 
         # --- Buttons ---
         self.save_button = QPushButton("Save")
@@ -93,16 +101,20 @@ class ConfigDialog(QWidget):
         obfuscated_token = obfuscate_token(api_token)
 
         # Save proxy settings
-        config['Proxy']['use_proxy'] = str(self.use_proxy_checkbox.isChecked())
-        config['Proxy']['http'] = self.http_proxy_input.text()
-        config['Proxy']['https'] = self.https_proxy_input.text()
-        config['HuggingFace']['rate_limit_delay'] = str(rate_limit_delay)  # Store as string
-        config['HuggingFace']['api_token'] = obfuscated_token  # Obfuscated API token
+        config["Proxy"]["use_proxy"] = str(self.use_proxy_checkbox.isChecked())
+        config["Proxy"]["http"] = self.http_proxy_input.text()
+        config["Proxy"]["https"] = self.https_proxy_input.text()
+        config["HuggingFace"]["rate_limit_delay"] = str(
+            rate_limit_delay
+        )  # Store as string
+        config["HuggingFace"]["api_token"] = obfuscated_token  # Obfuscated API token
 
         # Write to config file
         try:
             if save_config():  # Call save_config and check for success
-                QMessageBox.information(self, "Success", "Configuration saved successfully.")
+                QMessageBox.information(
+                    self, "Success", "Configuration saved successfully."
+                )
                 self.close()
             else:
                 QMessageBox.critical(self, "Error", "Failed to save configuration.")

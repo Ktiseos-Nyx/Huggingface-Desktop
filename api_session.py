@@ -16,18 +16,15 @@ def create_session():
     retry = Retry(
         total=5,  # Maximum number of retries
         backoff_factor=0.5,  # Exponential backoff factor (sleep longer between retries)
-        status_forcelist=[500, 502, 503, 504]  # HTTP status codes to retry on
+        status_forcelist=[500, 502, 503, 504],  # HTTP status codes to retry on
     )
     adapter = HTTPAdapter(max_retries=retry)
-    session.mount('http://', adapter)
-    session.mount('https://', adapter)
+    session.mount("http://", adapter)
+    session.mount("https://", adapter)
 
     # Proxy configuration
-    if config.getboolean('Proxy', 'use_proxy'):
-        proxies = {
-            'http': config['Proxy']['http'],
-            'https': config['Proxy']['https']
-        }
+    if config.getboolean("Proxy", "use_proxy"):
+        proxies = {"http": config["Proxy"]["http"], "https": config["Proxy"]["https"]}
         session.proxies.update(proxies)
         logger.info(f"Using proxy: {proxies}")
     else:

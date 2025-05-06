@@ -1,13 +1,24 @@
 import logging
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QTabWidget, QPushButton,
-                             QMessageBox, QSizePolicy, QMenuBar, QMenu, QApplication)
+from PyQt6.QtWidgets import (
+    QWidget,
+    QVBoxLayout,
+    QTabWidget,
+    QPushButton,
+    QMessageBox,
+    QSizePolicy,
+    QMenuBar,
+    QMenu,
+    QApplication,
+)
 from PyQt6.QtGui import QAction
 from zip_app import ZipApp
 from hf_uploader import HuggingFaceUploader
 from download_app import DownloadApp
 from theme_handler import apply_theme, get_available_themes
 from custom_exceptions import ConfigError
+
 logger = logging.getLogger(__name__)
+
 
 class MainWindow(QWidget):
     """Main application window."""
@@ -66,7 +77,9 @@ class MainWindow(QWidget):
         for theme in available_themes:
             logger.info(f"Processing theme: {theme}")
             action = QAction(theme, self)
-            action.triggered.connect(lambda checked=False, theme_name=theme: self.change_theme(theme_name))
+            action.triggered.connect(
+                lambda checked=False, theme_name=theme: self.change_theme(theme_name)
+            )
             self.theme_menu.addAction(action)
             self.theme_actions[theme] = action
             logger.info(f"Action created for theme: {theme}")
@@ -100,7 +113,7 @@ class MainWindow(QWidget):
         logger.info("MainWindow initialized")
 
         # Load Theme
-        apply_theme(self.app, theme_name='dark_teal.xml')  # Apply the theme
+        apply_theme(self.app, theme_name="dark_teal.xml")  # Apply the theme
 
     def change_theme(self, theme_name):
         """Changes the application theme at runtime."""
@@ -109,12 +122,17 @@ class MainWindow(QWidget):
 
     def closeEvent(self, event):
         """Handles the window close event."""
-        reply = QMessageBox.question(self, 'Exit',
-                                     "Are you sure you want to exit?",
-                                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
-                                     QMessageBox.StandardButton.No)
+        reply = QMessageBox.question(
+            self,
+            "Exit",
+            "Are you sure you want to exit?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
 
         if reply == QMessageBox.StandardButton.Yes:
             event.accept()
         else:
             event.ignore()
+# In this version of main_window.py, there isn't any required changes.
+# The changes should be done in the children files.
