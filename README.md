@@ -19,7 +19,9 @@ This tool provides a graphical user interface (GUI) for interacting with the Hug
 https://github.com/user-attachments/assets/67105f33-4f13-438e-91b3-f029b9e80066
 
 #### Ascii Cast
-<script src="https://asciinema.org/a/O3X0ubf8j9ZClIfZKas25mkSp.js" id="asciicast-O3X0ubf8j9ZClIfZKas25mkSp" async="true"></script>
+[![asciicast](https://asciinema.org/a/O3X0ubf8j9ZClIfZKas25mkSp.svg)](https://asciinema.org/a/O3X0ubf8j9ZClIfZKas25mkSp)
+See the recording on [asciinema.org](https://asciinema.org/a/O3X0ubf8j9ZClIfZKas25mkSp).
+
 
 **Why use this tool instead of the command line?**
 
