@@ -1,7 +1,7 @@
 # Hugging Face Backup Tool
 
 A user-friendly desktop application for backing up your Hugging Face models, datasets, and spaces. This is in progress so some things may not be working 100% quite yet.
-<img width="803" alt="Screenshot 2025-05-06 at 11 28 13" src="https://github.com/user-attachments/assets/aaad7468-3fa3-4c68-93c1-21b2cf09ff8e" />
+
 
 ## Overview
 
@@ -10,6 +10,16 @@ This tool provides a graphical user interface (GUI) for interacting with the Hug
 *   **Upload files and folders:** Quickly back up your local models, datasets, and spaces to the Hugging Face Hub.
 *   **Manage repositories:** Organize your backups into different repositories.
 *   **Configure settings:** Easily set your API token, proxy settings, and rate limit delay.
+
+### Image & Overview Preview
+
+<img width="803" alt="Screenshot 2025-05-06 at 11 28 13" src="https://github.com/user-attachments/assets/aaad7468-3fa3-4c68-93c1-21b2cf09ff8e" />
+
+#### Video
+https://github.com/user-attachments/assets/67105f33-4f13-438e-91b3-f029b9e80066
+
+#### Ascii Cast
+<script src="https://asciinema.org/a/O3X0ubf8j9ZClIfZKas25mkSp.js" id="asciicast-O3X0ubf8j9ZClIfZKas25mkSp" async="true"></script>
 
 **Why use this tool instead of the command line?**
 
