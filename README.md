@@ -1,4 +1,4 @@
-[![](https://dcbadge.limes.pink/api/server/INVITE)](https://discord.gg/HhBSvM9gBY) [![view - Documentation](https://img.shields.io/badge/view-Documentation-blue?style=for-the-badge)](/docs/ "Go to project documentation") [![contributions - welcome](https://img.shields.io/badge/contributions-welcome-blue)](/CONTRIBUTING.md "Go to contributions doc") [![Made with Python](https://img.shields.io/badge/Python->=3.10-blue?logo=python&logoColor=white)](https://python.org "Go to Python homepage") 
+[![](https://dcbadge.limes.pink/api/server/INVITE)](https://discord.gg/MASBKnNFWh) [![view - Documentation](https://img.shields.io/badge/view-Documentation-blue?style=for-the-badge)](/docs/ "Go to project documentation") [![contributions - welcome](https://img.shields.io/badge/contributions-welcome-blue)](/CONTRIBUTING.md "Go to contributions doc") [![Made with Python](https://img.shields.io/badge/Python->=3.10-blue?logo=python&logoColor=white)](https://python.org "Go to Python homepage") 
 # Hugging Face Backup Tool
 
 A user-friendly desktop application for backing up your Hugging Face models, datasets, and spaces.
