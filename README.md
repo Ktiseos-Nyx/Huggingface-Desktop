@@ -1,6 +1,6 @@
 # Hugging Face Backup Tool
 
-A user-friendly desktop application for backing up your Hugging Face models, datasets, and spaces. This is in progress so some things may not be working 100% quite yet. Also the requirements and installation aren't as focused as they could be.
+A user-friendly desktop application for backing up your Hugging Face models, datasets, and spaces. 
 
 [[_TOC_]]
 
@@ -27,9 +27,10 @@ A user-friendly desktop application for backing up your Hugging Face models, dat
         *   [Required Packages:](#required-packages)
         *   [6. Run the Application:](#6-run-the-application)
 4.  [Configuration](#configuration)
-5.  [Usage](#usage)
-6.  [Contributing](#contributing)
-7.  [License](#license)
+5.  [Issues][#issues]
+6.  [Usage](#usage)
+7.  [Contributing](#contributing)
+8.  [License](#license)
 
 ## Overview
 
@@ -227,6 +228,15 @@ The following packages are required to run this tool:
 2.  **Open the Configuration Dialog:** Click the "Edit Config (API Token)" button in the application.
 3.  **Enter Your API Token:** Paste your API token into the "Hugging Face API Token" field.
 4.  **Save the Configuration:** Click the "Save" button.
+
+## Issues 
+
+1. Currently is only allowing for ONE SINGULAR file to upload.
+2. Output isn't showing in the progress thing for uploading - you'll need to check terminal logs.
+3. MIGHT still crash on create repo.  Likely best to pre-make one, however it works with making a subfolder.
+4. SPACING issues still.
+5. Multiple file not really there
+6. Developing on a mac is hard, shut up.
 
 ## Usage
 
