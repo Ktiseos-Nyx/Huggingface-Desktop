@@ -12,6 +12,7 @@ from pathlib import Path
 from huggingface_hub import (  # Import the library
     HfApi,
     upload_folder,
+    errors,
 )
 from PyQt6.QtCore import QThread, pyqtSignal  # Import QThread and pyqtSignal
 from PyQt6.QtGui import QAction
@@ -30,6 +31,8 @@ from PyQt6.QtWidgets import (
     QVBoxLayout,
     QWidget,
 )  # Import QApplication
+
+from config_manager import get_api_token  # Import the function
 
 logger = logging.getLogger(__name__)
 
@@ -105,7 +108,7 @@ class HFUploaderThread(QThread):
 
             try:  # Wrap the get_api_token call
                 api_token = get_api_token()  # Use the function from config_manager
-            except APIKeyError as e:
+            except KeyError as e:  # Changed to KeyError
                 self.signal_output.emit(f"❌ API Key Error: {e}")
                 self.signal_finished.emit()
                 return
@@ -171,6 +174,15 @@ class HFUploaderThread(QThread):
                         )
                         self.signal_output.emit(str(response))
 
+                    except huggingface_hub.errors.RepositoryNotFoundError as e:
+                        logger.error(
+                            f"Upload error: {e}", exc_info=True
+                        )  # Log the full exception
+                        self.signal_output.emit(
+                            f"❌ Error uploading {ckpt}: {type(e).__name__} - {str(e)}"
+                        )
+                        self.signal_output.emit(traceback.format_exc())
+                        raise  # Re-raise the exception
                     except Exception as e:
                         logger.error(
                             f"Upload error: {e}", exc_info=True
@@ -180,13 +192,13 @@ class HFUploaderThread(QThread):
                         )
                         self.signal_output.emit(traceback.format_exc())
                         # Re-raise the exception as an UploadError
-                        raise UploadError(f"Failed to upload {ckpt}: {e}") from e
+                        raise
 
                     # Rate limiting
                     time.sleep(float(self.rate_limit_delay))  # Delay between API calls
 
-            except UploadError as e:  # Catch the upload error
-                logger.exception("An unexpected error occurred during upload.")
+            except huggingface_hub.errors.RepositoryNotFoundError as e:
+                logger.exception("Repository Not Found during upload.")
                 self.signal_output.emit(
                     f"❌ An unexpected error occurred: {type(e).__name__} - {str(e)}"
                 )
