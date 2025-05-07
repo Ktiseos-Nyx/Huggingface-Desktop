@@ -1,50 +1,37 @@
+import glob
 import logging
 import os
-import glob
-import traceback
 import time
+import traceback
 from pathlib import Path
 
+# from config_dialog import ConfigDialog  # Not needed here - but good for ref.
+# hf_uploader_thread.py
+# import huggingface_hub
+# from huggingface_hub.utils import get_hf_home_dir # OLD
+from huggingface_hub import (  # Import the library
+    HfApi,
+    upload_folder,
+)
+from PyQt6.QtCore import QThread, pyqtSignal  # Import QThread and pyqtSignal
+from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import (
-    QWidget,
-    QLabel,
-    QLineEdit,
-    QPushButton,
-    QVBoxLayout,
-    QHBoxLayout,
-    QFileDialog,
-    QTextEdit,
+    QApplication,
     QCheckBox,
     QComboBox,
+    QFileDialog,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
     QListWidget,
     QProgressBar,
-    QApplication,
+    QPushButton,
+    QTextEdit,
+    QVBoxLayout,
+    QWidget,
 )  # Import QApplication
-from PyQt6.QtGui import QAction
-from PyQt6.QtCore import QThread, pyqtSignal  # Import QThread and pyqtSignal
-from huggingface_hub import HfApi, upload_folder
-from config_manager import config, deobfuscate_token  # Needed for Config
-from config_dialog import ConfigDialog  # Needed for config
-from custom_exceptions import UploadError, APIKeyError
-
 
 logger = logging.getLogger(__name__)
-
-
-def get_api_token(api_token_alias):
-    """Retrieves the API token from the configuration file."""
-    try:
-        obfuscated_token = config["HuggingFace"][api_token_alias]
-        api_token = deobfuscate_token(obfuscated_token)
-        if not api_token:
-            raise APIKeyError("API token is empty after deobfuscation.")
-        return api_token
-    except KeyError:
-        raise APIKeyError(
-            f"API token alias '{api_token_alias}' not found in configuration."
-        )
-    except Exception as e:
-        raise APIKeyError(f"Error retrieving API token: {e}") from e
 
 
 def format_size(size):
@@ -66,7 +53,6 @@ class HFUploaderThread(QThread):
 
     def __init__(
         self,
-        api,
         repo_id,
         selected_files,
         repo_type,
@@ -76,8 +62,20 @@ class HFUploaderThread(QThread):
         create_pr,
         rate_limit_delay,
     ):
+        """
+        Initializes the HFUploaderThread.
+
+        Args:
+            repo_id (str): The ID of the Hugging Face repository (e.g., "username/repo_name").
+            selected_files (list): A list of file paths to upload.
+            repo_type (str): The type of the repository (e.g., "model", "dataset").
+            repo_folder (str): The subfolder within the repository (optional).
+            current_directory (str): The current working directory.
+            commit_msg (str): The commit message for the upload.
+            create_pr (bool): Whether to create a pull request.
+            rate_limit_delay (float): The delay in seconds between uploads.
+        """
         super().__init__()
-        self.api = api
         self.repo_id = repo_id
         self.selected_files = selected_files
         self.repo_type = repo_type
@@ -88,39 +86,46 @@ class HFUploaderThread(QThread):
         self.rate_limit_delay = rate_limit_delay
         self.stop_flag = False
         self.is_stopped = False  # Add this line
+        self.api = HfApi()  # Initialize the API
 
     def stop(self):
+        """Sets the stop flag to request the thread to stop."""
         self.stop_flag = True
         self.is_stopped = True  # Add this line
 
     def run(self):
+        """
+        Executes the upload process in a separate thread.
+        """
         try:
             logger.info("HFUploaderThread: run() called")
             total_files = len(self.selected_files)
             self.signal_status.emit("Starting upload...")
             self.signal_progress.emit(0)
 
-            api_token_alias = config["HuggingFace"]["api_token"]
-            logger.info("api_token_alias: " + api_token_alias)
-
             try:  # Wrap the get_api_token call
-                api_token = get_api_token(api_token_alias)
+                api_token = get_api_token()  # Use the function from config_manager
             except APIKeyError as e:
                 self.signal_output.emit(f"❌ API Key Error: {e}")
                 self.signal_finished.emit()
                 return
 
-            if not api_token:  # This check is now redundant, but leave it for safety
+            if not api_token:
                 self.signal_output.emit("❌ API token not found. Please configure it.")
                 self.signal_finished.emit()
                 return
 
+            # Initialize the API with the token
+            self.api = HfApi(
+                token=api_token
+            )  # Initialize here, after the token is retrieved
+
             logger.info("Api Token Found")
             try:
                 for idx, ckpt in enumerate(self.selected_files, 1):
-                    if self.is_stopped:
+                    if self.stop_flag:
                         self.signal_status.emit("Upload cancelled.")
-                        return
+                        break  # Exit the loop if the stop flag is set
 
                     self.signal_status.emit(f"Uploading: {ckpt}")
                     file_size = os.path.getsize(ckpt)

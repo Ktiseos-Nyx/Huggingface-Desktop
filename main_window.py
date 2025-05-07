@@ -1,21 +1,27 @@
 import logging
+
+from config_dialog import ConfigDialog
+from config_manager import config
+from custom_exceptions import APIKeyError, ConfigError
+from download_app import DownloadApp
+from hf_uploader import HuggingFaceUploader
+from huggingface_hub import HfApi, upload_folder
+
+# from huggingface_hub.utils import get_hf_home_dir
+from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtWidgets import (
-    QWidget,
-    QVBoxLayout,
-    QTabWidget,
-    QPushButton,
-    QMessageBox,
-    QSizePolicy,
-    QMenuBar,
     QMenu,
+    QMenuBar,
+    QMessageBox,
+    QPushButton,
+    QSizePolicy,
+    QTabWidget,
+    QVBoxLayout,
+    QWidget,
     QApplication,
 )
-from PyQt6.QtGui import QAction
-from zip_app import ZipApp
-from hf_uploader import HuggingFaceUploader
-from download_app import DownloadApp
 from theme_handler import apply_theme, get_available_themes
-from custom_exceptions import ConfigError
+from zip_app import ZipApp
 
 logger = logging.getLogger(__name__)
 
@@ -23,105 +29,118 @@ logger = logging.getLogger(__name__)
 class MainWindow(QWidget):
     """Main application window."""
 
-    def __init__(self, app):  # Accept the QApplication instance
+    def __init__(self, app: QApplication):  # Accept the QApplication instance
+        """Initializes the main window."""
         super().__init__()
         logger.info("MainWindow initializing...")
         self.setWindowTitle("Hugging Face Backup Tool")
         self.app = app  # Store the QApplication instance
+        self.uploader_thread = None  # Store the upload thread
 
-        # Create instances of your widgets
-        logger.info("Creating widget instances...")
+        # Create widget instances
+        logger.debug("Creating widget instances")
         self.zip_app = ZipApp()
-        logger.info("ZipApp created")
         self.hf_uploader = HuggingFaceUploader()
-        logger.info("HuggingFaceUploader created")
         self.download_app = DownloadApp()
-        logger.info("DownloadApp created")
         self.config_dialog = None
 
-        # Tab widget
-        logger.info("Creating tab widget...")
+        # Create Tab Widget and add tabs
+        logger.debug("Creating tab widget")
         self.tab_widget = QTabWidget()
         self.tab_widget.addTab(self.hf_uploader, "Hugging Face Uploader")
-        logger.info("HF Uploader tab added")
-        self.tab_widget.addTab(self.zip_app, "Zip Folder")
-        logger.info("ZipApp tab added")
-        self.tab_widget.addTab(self.download_app, "Download")
-        logger.info("DownloadApp Tab Added")
-
-        # Set the initial tab
-        self.tab_widget.setCurrentIndex(0)
-        logger.info("Initial tab set")
+        # Uncomment if you add these tabs later
+        # self.tab_widget.addTab(self.zip_app, "Zip Folder")
+        # self.tab_widget.addTab(self.download_app, "Download")
 
         # Exit Button
-        logger.info("Creating exit button...")
+        logger.debug("Creating exit button")
         self.exit_button = QPushButton("Exit")
         self.exit_button.clicked.connect(self.close)
-        logger.info("Exit button created and connected")
 
-        # Create Menu Bar
-        logger.info("Creating menu bar...")
+        # Apply the layouts
+        main_layout = self.create_layout()
+        self.setLayout(main_layout)
+
+        # Set initial size
+        self.resize(800, 600)
+
+        # Apply default theme
+        try:
+            apply_theme(self.app, theme_name="dark_teal.xml")
+        except Exception as e:  # Handle errors during theme application
+            logger.error(f"Error applying initial theme: {e}")
+            QMessageBox.critical(self, "Error", f"Failed to apply default theme: {e}")
+
+        logger.info("MainWindow initialized")
+
+    def create_layout(self):
+        """Creates and returns the main layout of the window."""
+        # Create Menu Bar for theme selection
+        logger.debug("Creating menu bar and theme menu")
         self.menu_bar = QMenuBar(self)
         self.theme_menu = QMenu("Theme", self)
         self.menu_bar.addMenu(self.theme_menu)
-        logger.info("Menu bar and theme menu created")
+
+        # Create File Menu
+        self.file_menu = QMenu("File", self)  # Create the File menu
+        self.menu_bar.addMenu(self.file_menu)
+
+        # Add Configure Action (Config Dialog)
+        self.config_action = QAction("Configure", self)
+        self.config_action.triggered.connect(self.show_config_dialog)
+        self.file_menu.addAction(self.config_action)  # Add the action to the File menu
 
         # List available themes
-        logger.info("Listing available themes...")
+        logger.debug("Listing available themes")
         available_themes = get_available_themes()
         self.theme_actions = {}
-
-        logger.info(f"Found themes: {available_themes}")
-
-        logger.info("Creating theme actions...")
         for theme in available_themes:
-            logger.info(f"Processing theme: {theme}")
+            logger.debug(f"Creating action for theme: {theme}")
             action = QAction(theme, self)
+            # Use lambda with default argument to capture current theme
             action.triggered.connect(
                 lambda checked=False, theme_name=theme: self.change_theme(theme_name)
             )
             self.theme_menu.addAction(action)
             self.theme_actions[theme] = action
-            logger.info(f"Action created for theme: {theme}")
 
-        logger.info("Theme actions created")
-
-        # Layout Setup
-        # Create a layout for the main window
-        logger.info("Creating main layout...")
+        # Create main layout
+        logger.debug("Creating main layout")
         main_layout = QVBoxLayout()
+        main_layout.setContentsMargins(
+            15, 15, 15, 15
+        )  # Margins around the whole layout
+        main_layout.setSpacing(12)  # Space between widgets
+
+        # Add menu bar at the top
         main_layout.setMenuBar(self.menu_bar)
-        main_layout.addWidget(self.tab_widget)
-        main_layout.addWidget(self.exit_button)
-        logger.info("Main layout created")
 
-        # Make the window resizable
-        logger.info("Setting size policy...")
-        self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        logger.info("Size policy set")
+        # Add tab widget with stretch factor (more space)
+        main_layout.addWidget(self.tab_widget, stretch=8)
 
-        # Set the layout for the main window
-        logger.info("Setting layout...")
-        self.setLayout(main_layout)
-        logger.info("Layout set")
+        # Add Exit button with less stretch
+        main_layout.addWidget(self.exit_button, stretch=1)
+        return main_layout
 
-        # Set the initial size of the window
-        logger.info("Setting initial size...")
-        self.resize(800, 600)
-        logger.info("Initial size set")
-
-        logger.info("MainWindow initialized")
-
-        # Load Theme
-        apply_theme(self.app, theme_name="dark_teal.xml")  # Apply the theme
+    def show_config_dialog(self):
+        """Shows the configuration dialog."""
+        if not self.config_dialog:
+            self.config_dialog = ConfigDialog()  # Create the dialog
+        self.config_dialog.exec()  # Show the dialog
+        # Optional: You could refresh some UI elements here if config changes affect them
+        # self.hf_uploader.refresh_ui() # example
 
     def change_theme(self, theme_name):
-        """Changes the application theme at runtime."""
-        apply_theme(self.app, theme_name=theme_name)
-        logger.info(f"Theme changed to {theme_name}")
+        """Change the application's theme at runtime."""
+        try:
+            apply_theme(self.app, theme_name)
+            logger.info(f"Theme changed to {theme_name}")
+        except Exception as e:
+            logger.error(f"Error changing theme: {e}")
+            QMessageBox.critical(self, "Error", f"Failed to apply theme: {e}")
 
     def closeEvent(self, event):
-        """Handles the window close event."""
+        """Handle window close with confirmation."""
         reply = QMessageBox.question(
             self,
             "Exit",
@@ -129,10 +148,11 @@ class MainWindow(QWidget):
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
             QMessageBox.StandardButton.No,
         )
-
         if reply == QMessageBox.StandardButton.Yes:
+            logger.debug("Close event accepted")
             event.accept()
         else:
             event.ignore()
-# In this version of main_window.py, there isn't any required changes.
-# The changes should be done in the children files.
+
+    def __del__(self):
+        logger.debug("MainWindow is being destroyed")

@@ -11,7 +11,16 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt
 from custom_exceptions import ConfigError  # Import ConfigError
-from config_manager import config, save_config
+from config_manager import (
+    config,
+    set_api_token,
+    get_api_token,
+    get_rate_limit_delay,
+    set_rate_limit_delay,  # Make sure this is imported
+    set_proxy,
+    get_proxy,
+    # save_config # You don't really need to import save_config directly in the ConfigDialog
+)
 
 
 logger = logging.getLogger(__name__)
@@ -33,9 +42,14 @@ class ConfigDialog(QWidget):
     """Dialog for configuring settings."""
 
     def __init__(self):
+        """Initializes the configuration dialog."""
         super().__init__()
         self.setWindowTitle("Configuration")
+        self.init_ui()
+        self.load_config_values()
 
+    def init_ui(self):
+        """Initializes the user interface elements and layout."""
         # --- API Token Section ---
         self.api_token_label = QLabel("Hugging Face API Token:")
         self.api_token_input = QLineEdit()  # No default
@@ -43,13 +57,13 @@ class ConfigDialog(QWidget):
 
         # --- Proxy Section ---
         self.use_proxy_checkbox = QCheckBox("Use Proxy")
-        self.use_proxy_checkbox.setChecked(config.getboolean("Proxy", "use_proxy"))
+        # self.use_proxy_checkbox.setChecked(config.getboolean("Proxy", "use_proxy"))
         self.http_proxy_label = QLabel("HTTP Proxy:")
-        self.http_proxy_input = QLineEdit(config["Proxy"]["http"])
+        self.http_proxy_input = QLineEdit()  # No default - filled from load
         self.https_proxy_label = QLabel("HTTPS Proxy:")
-        self.https_proxy_input = QLineEdit(config["Proxy"]["https"])
+        self.https_proxy_input = QLineEdit()  # No default - filled from load
         self.rate_limit_label = QLabel("Rate Limit Delay (seconds):")
-        self.rate_limit_input = QLineEdit(config["HuggingFace"]["rate_limit_delay"])
+        self.rate_limit_input = QLineEdit()
 
         # --- Buttons ---
         self.save_button = QPushButton("Save")
@@ -84,6 +98,20 @@ class ConfigDialog(QWidget):
         self.save_button.clicked.connect(self.save_config)
         self.cancel_button.clicked.connect(self.close)
 
+    def load_config_values(self):
+        """Loads configuration values from the config manager and populates the UI."""
+        # Load API token
+        self.api_token_input.setText(get_api_token() or "")  # Load the API token
+        # Load Proxy settings
+        proxy_settings = get_proxy()
+        self.use_proxy_checkbox.setChecked(
+            proxy_settings.get("use_proxy", "False") == "True"
+        )
+        self.http_proxy_input.setText(proxy_settings.get("http", ""))
+        self.https_proxy_input.setText(proxy_settings.get("https", ""))
+        # Load Rate limit delay
+        self.rate_limit_input.setText(str(get_rate_limit_delay()))
+
     def save_config(self):
         """Saves the configuration settings."""
         api_token = self.api_token_input.text()
@@ -97,26 +125,27 @@ class ConfigDialog(QWidget):
             QMessageBox.critical(self, "Error", str(e))
             return
 
-        # Obfuscate the API token
-        obfuscated_token = obfuscate_token(api_token)
-
-        # Save proxy settings
-        config["Proxy"]["use_proxy"] = str(self.use_proxy_checkbox.isChecked())
-        config["Proxy"]["http"] = self.http_proxy_input.text()
-        config["Proxy"]["https"] = self.https_proxy_input.text()
-        config["HuggingFace"]["rate_limit_delay"] = str(
-            rate_limit_delay
-        )  # Store as string
-        config["HuggingFace"]["api_token"] = obfuscated_token  # Obfuscated API token
-
-        # Write to config file
+        # Save the config values
         try:
-            if save_config():  # Call save_config and check for success
-                QMessageBox.information(
-                    self, "Success", "Configuration saved successfully."
-                )
-                self.close()
-            else:
-                QMessageBox.critical(self, "Error", "Failed to save configuration.")
+            # Set API token
+            set_api_token(api_token)  # Store the api token in the manager
+
+            # Save proxy settings
+            proxy_settings = {
+                "use_proxy": str(self.use_proxy_checkbox.isChecked()),
+                "http": self.http_proxy_input.text(),
+                "https": self.https_proxy_input.text(),
+            }
+            set_proxy(proxy_settings)  #  save proxy settings
+            # Save rate limit
+            # config["HuggingFace"]["rate_limit_delay"] = str(rate_limit_delay)
+            set_rate_limit_delay(rate_limit_delay)
+            QMessageBox.information(
+                self, "Success", "Configuration saved successfully."
+            )
+            self.close()
         except ConfigError as e:
             QMessageBox.critical(self, "Error", f"Failed to save configuration: {e}")
+        except Exception as e:
+            # Catch any unexpected errors
+            QMessageBox.critical(self, "Error", f"An unexpected error occurred: {e}")
