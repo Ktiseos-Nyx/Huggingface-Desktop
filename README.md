@@ -19,7 +19,8 @@ This tool provides a graphical user interface (GUI) for interacting with the Hug
 https://github.com/user-attachments/assets/67105f33-4f13-438e-91b3-f029b9e80066
 
 #### Ascii Cast
-[![asciicast](https://asciinema.org/a/O3X0ubf8j9ZClIfZKas25mkSp.svg)](https://asciinema.org/a/O3X0ubf8j9ZClIfZKas25mkSp)
+![718285](https://github.com/user-attachments/assets/8ccf5fb2-c36f-4e28-995e-6bb1b80886eb)
+
 See the recording on [asciinema.org](https://asciinema.org/a/O3X0ubf8j9ZClIfZKas25mkSp).
 
 
