@@ -82,6 +82,10 @@ class HuggingFaceUploader(QWidget):
         self.repo_type_dropdown = QComboBox()
         self.repo_type_dropdown.addItems(["model", "dataset", "space"])
 
+        # Repo Folder Input
+        self.repo_folder_label = QLabel("Repo Folder:")
+        self.repo_folder_input = QLineEdit()
+
         # Place widgets in grid
         repo_layout.addWidget(self.org_label, 0, 0)
         repo_layout.addWidget(self.org_input, 0, 1)
@@ -89,6 +93,8 @@ class HuggingFaceUploader(QWidget):
         repo_layout.addWidget(self.repo_input, 0, 3)
         repo_layout.addWidget(self.repo_type_label, 1, 0)
         repo_layout.addWidget(self.repo_type_dropdown, 1, 1)
+        repo_layout.addWidget(self.repo_folder_label, 1, 2)
+        repo_layout.addWidget(self.repo_folder_input, 1, 3)
         main_layout.addLayout(repo_layout)
 
         # --- Directory Selection ---
