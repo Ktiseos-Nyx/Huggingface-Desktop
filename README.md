@@ -1,7 +1,35 @@
 # Hugging Face Backup Tool
 
-A user-friendly desktop application for backing up your Hugging Face models, datasets, and spaces. This is in progress so some things may not be working 100% quite yet.
+A user-friendly desktop application for backing up your Hugging Face models, datasets, and spaces. This is in progress so some things may not be working 100% quite yet. Also the requirements and installation aren't as focused as they could be.
 
+[[_TOC_]]
+
+## Table of Contents
+
+1.  [Overview](#overview)
+    *   [Image, Video & Ascii Terminal Views](#image-video--ascii-terminal-views)
+    *   [Why use this tool instead of the command line?](#why-use-this-tool-instead-of-the-command-line)
+2.  [Features](#features)
+3.  [Installation](#installation)
+    *   [Compatible Operating Systems (Theoretical)](#compatible-operating-systems-theoretical)
+    *   [Installation with UV (Recommended)](#installation-with-uv-recommended)
+        *   [1. Prerequisites:](#1-prerequisites)
+        *   [2. Clone the Repository:](#2-clone-the-repository)
+        *   [3. Create a Virtual Environment:](#3-create-a-virtual-environment)
+        *   [4. Activate the Virtual Environment:](#4-activate-the-virtual-environment)
+        *   [5. Install Dependencies with UV:](#5-install-dependencies-with-uv)
+    *   [Installation with Pip (Alternative)](#installation-with-pip-alternative)
+        *   [1. Prerequisites:](#1-prerequisites-1)
+        *   [2. Clone the Repository:](#2-clone-the-repository-1)
+        *   [3. Create a Virtual Environment:](#3-create-a-virtual-environment-1)
+        *   [4. Activate the Virtual Environment:](#4-activate-the-virtual-environment-1)
+        *   [5. Install Dependencies with Pip:](#5-install-dependencies-with-pip)
+        *   [Required Packages:](#required-packages)
+        *   [6. Run the Application:](#6-run-the-application)
+4.  [Configuration](#configuration)
+5.  [Usage](#usage)
+6.  [Contributing](#contributing)
+7.  [License](#license)
 
 ## Overview
 
@@ -12,6 +40,11 @@ This tool provides a graphical user interface (GUI) for interacting with the Hug
 *   **Configure settings:** Easily set your API token, proxy settings, and rate limit delay.
 
 ### Image & Overview Preview
+<details>
+
+<summary>Image, Video & Ascii Terminal Views</summary>
+
+
 
 <img width="803" alt="Screenshot 2025-05-06 at 11 28 13" src="https://github.com/user-attachments/assets/aaad7468-3fa3-4c68-93c1-21b2cf09ff8e" />
 
@@ -22,7 +55,7 @@ https://github.com/user-attachments/assets/67105f33-4f13-438e-91b3-f029b9e80066
 ![718285](https://github.com/user-attachments/assets/8ccf5fb2-c36f-4e28-995e-6bb1b80886eb)
 
 See the recording on [asciinema.org](https://asciinema.org/a/O3X0ubf8j9ZClIfZKas25mkSp).
-
+</details>
 
 **Why use this tool instead of the command line?**
 
@@ -180,6 +213,7 @@ The following packages are required to run this tool:
 *   `qt_material`
 *   `huggingface_hub`
 *   `requests`
+*   `Pyside6`
 
 **6. Run the Application:**
 
