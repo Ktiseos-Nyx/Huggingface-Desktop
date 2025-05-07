@@ -1,121 +1,100 @@
+[![](https://dcbadge.limes.pink/api/server/INVITE)](https://discord.gg/HhBSvM9gBY) [![view - Documentation](https://img.shields.io/badge/view-Documentation-blue?style=for-the-badge)](/docs/ "Go to project documentation") [![contributions - welcome](https://img.shields.io/badge/contributions-welcome-blue)](/CONTRIBUTING.md "Go to contributions doc") [![Made with Python](https://img.shields.io/badge/Python->=3.10-blue?logo=python&logoColor=white)](https://python.org "Go to Python homepage") 
 # Hugging Face Backup Tool
 
-A user-friendly desktop application for backing up your Hugging Face models, datasets, and spaces. 
-
-[[_TOC_]]
+A user-friendly desktop application for backing up your Hugging Face models, datasets, and spaces.
 
 ## Table of Contents
 
 1.  [Overview](#overview)
-    *   [Image, Video & Ascii Terminal Views](#image-video--ascii-terminal-views)
-    *   [Why use this tool instead of the command line?](#why-use-this-tool-instead-of-the-command-line)
 2.  [Features](#features)
 3.  [Installation](#installation)
-    *   [Compatible Operating Systems (Theoretical)](#compatible-operating-systems-theoretical)
-    *   [Installation with UV (Recommended)](#installation-with-uv-recommended)
-        *   [1. Prerequisites:](#1-prerequisites)
-        *   [2. Clone the Repository:](#2-clone-the-repository)
-        *   [3. Create a Virtual Environment:](#3-create-a-virtual-environment)
-        *   [4. Activate the Virtual Environment:](#4-activate-the-virtual-environment)
-        *   [5. Install Dependencies with UV:](#5-install-dependencies-with-uv)
-    *   [Installation with Pip (Alternative)](#installation-with-pip-alternative)
-        *   [1. Prerequisites:](#1-prerequisites-1)
-        *   [2. Clone the Repository:](#2-clone-the-repository-1)
-        *   [3. Create a Virtual Environment:](#3-create-a-virtual-environment-1)
-        *   [4. Activate the Virtual Environment:](#4-activate-the-virtual-environment-1)
-        *   [5. Install Dependencies with Pip:](#5-install-dependencies-with-pip)
-        *   [Required Packages:](#required-packages)
-        *   [6. Run the Application:](#6-run-the-application)
+    *   [3.1. System Requirements (Theoretical)](#31-system-requirements-theoretical)
+    *   [3.2. Installation Steps](#32-installation-steps)
 4.  [Configuration](#configuration)
-5.  [Issues](#issues)
+5.  [Issues & Known Limitations](#issues--known-limitations)
 6.  [Usage](#usage)
 7.  [Contributing](#contributing)
 8.  [License](#license)
 
-## Overview
+## 1. Overview
 
-This tool provides a graphical user interface (GUI) for interacting with the Hugging Face Hub, making it easier to:
+This tool provides a graphical user interface (GUI) to simplify backing up your local machine's files to the Hugging Face Hub. It's designed to be a more intuitive alternative to using the command-line interface (CLI).
 
-*   **Upload files and folders:** Quickly back up your local models, datasets, and spaces to the Hugging Face Hub.
-*   **Manage repositories:** Organize your backups into different repositories.
-*   **Configure settings:** Easily set your API token, proxy settings, and rate limit delay.
+*   **Upload Files and Folders:** Easily back up your local models, datasets, and spaces to the Hugging Face Hub.
+*   **Manage Repositories:** Organize your backups into different repositories.
+*   **Configure Settings:** Configure your API token, proxy settings, and rate limit delay, all within the application.
 
-### Image & Overview Preview
 <details>
+<summary>Preview</summary>
+<p align="center"><img width="1052" alt="Screenshot 2025-05-07 at 16 35 11" src="https://github.com/user-attachments/assets/09623bc9-4045-48b5-8f83-ffdeacc87d4c" />
 
-<summary>Image, Video & Ascii Terminal Views</summary>
-
-
-
-<img width="803" alt="Screenshot 2025-05-06 at 11 28 13" src="https://github.com/user-attachments/assets/aaad7468-3fa3-4c68-93c1-21b2cf09ff8e" />
-
-#### Video
-https://github.com/user-attachments/assets/67105f33-4f13-438e-91b3-f029b9e80066
-
-#### Ascii Cast
-![718285](https://github.com/user-attachments/assets/8ccf5fb2-c36f-4e28-995e-6bb1b80886eb)
-
-See the recording on [asciinema.org](https://asciinema.org/a/O3X0ubf8j9ZClIfZKas25mkSp).
+  
+</p>
 </details>
 
 **Why use this tool instead of the command line?**
 
-While the Hugging Face Hub command-line interface (CLI) is powerful, it can be intimidating for users who are not comfortable with the command line. This tool offers a more intuitive and visual way to manage your Hugging Face backups, making it accessible to a wider audience.
+> The Hugging Face Hub CLI is powerful, but it can be intimidating for users unfamiliar with the command line. This tool offers a more visual and intuitive approach to managing your Hugging Face backups, making it more accessible.
 
-## Features
+## 2. Features
 
-*   **Hugging Face Uploader:** Upload files and folders to the Hugging Face Hub with ease.
-*   **Zip Folder:** Create zip archives of your local folders.
+Here's a quick overview of what you can do with the Hugging Face Backup Tool:
+
+*   **Hugging Face Uploader:**  Upload files and entire folders to the Hugging Face Hub.
+*   **Zip Folder:** Create ZIP archives of your local folders for backup.
 *   **Download:** Download files from the Hugging Face Hub.
-*   **Material Themes:** Customize the look and feel of the application with a variety of beautiful Qt Material themes.
+*   **Material Themes:** Customize the application's appearance with a variety of beautiful Qt Material themes.
 
-## Installation
+## 3. Installation
 
-This tool requires **Python 3.10 or higher**. You can install it using either [UV](https://astral.sh/blog/uv) (recommended for faster installation) or the standard `pip` package installer.
+This section guides you through installing and setting up the tool. It requires **Python 3.10 or higher**.
 
-### Compatible Operating Systems (Theoretical)
+### 3.1. System Requirements (Theoretical)
 
-This tool is built using PyQt6, which is a cross-platform GUI framework. Therefore, it should theoretically be compatible with the following operating systems:
+The Hugging Face Backup Tool is built using PyQt6, a cross-platform GUI framework. This means it *should* be compatible with the following operating systems:
 
 *   **Windows:** Windows 10 or later (64-bit)
 *   **macOS:** macOS 10.14 (Mojave) or later
 *   **Linux:** Most modern Linux distributions (e.g., Ubuntu, Fedora, Debian)
 
-**Note:** While the tool *should* work on these operating systems, it has only been tested on [MacOS Ventura 13.5.1]. Your experience may vary. Please report any compatibility issues you encounter.
+> **Important Note:** While the tool *should* work on these operating systems, it has only been tested on [MacOS Ventura 13.5.1]. Your experience may vary. Please report any compatibility issues you encounter!
 
-### Installation with UV (Recommended)
+### 3.2. Installation Steps
 
-[UV](https://astral.sh/blog/uv) is a blazingly fast Python package installer and resolver. It's designed to be a drop-in replacement for `pip` and offers significant performance improvements.
+Here are the general steps for installing the tool.
 
-**1. Prerequisites:**
+**Steps:**
 
-*   **Python 3.10 or higher:** Make sure you have Python installed on your system.
-*   **UV:** Install UV using pip:
+1.  **Install Python:** Make sure you have Python 3.10 or higher installed.  You can download it from the official Python website ([https://www.python.org/downloads/](https://www.python.org/downloads/)) or your operating system's package manager.
 
-    ```bash
-    pip install uv
-    ```
+    *   **Windows:**  During installation, make sure to check the box "Add Python to PATH".
+    *   **Linux:**  Use your distribution's package manager (e.g., `sudo apt install python3` on Debian/Ubuntu, `sudo dnf install python3` on Fedora/CentOS/RHEL).
+    *   **macOS:** You may install with Homebrew (`brew install python@3.10`) but you may also install from the website.
 
-**2. Clone the Repository:**
+2.  **Clone the Repository:**  Open a terminal or command prompt and clone the repository:
 
     ```bash
     git clone [YOUR_REPOSITORY_URL]
     cd [YOUR_REPOSITORY_DIRECTORY]
     ```
 
-    Replace `[YOUR_REPOSITORY_URL]` with the URL of your GitHub repository and `[YOUR_REPOSITORY_DIRECTORY]` with the name of the directory you cloned into.
+    > Replace `[YOUR_REPOSITORY_URL]` with the URL of your GitHub repository and `[YOUR_REPOSITORY_DIRECTORY]` with the desired directory name.
 
-**3. Create a Virtual Environment:**
-
-    It's highly recommended to use a virtual environment to isolate the project's dependencies.
+3.  **Create a Virtual Environment (Recommended):**  It's best practice to use a virtual environment.  This isolates the project's dependencies.
 
     ```bash
     python -m venv .venv
     ```
 
-**4. Activate the Virtual Environment:**
+4.  **Activate the Virtual Environment:**
 
-    *   **Bash/Zsh:**
+    *   **Windows:**
+
+        ```cmd
+        .venv\Scripts\activate
+        ```
+
+    *   **Linux/macOS (Bash/Zsh):**
 
         ```bash
         source .venv/bin/activate
@@ -127,131 +106,69 @@ This tool is built using PyQt6, which is a cross-platform GUI framework. Therefo
         source .venv/bin/activate.fish
         ```
 
-        **Important for FISH users:** UV doesn't directly support `activate.fish`. You may need to manually add the virtual environment's `bin` directory to your `PATH` in your `~/.config/fish/config.fish` file:
-
-        ```fish
-        set -U fish_user_paths .venv/bin $fish_user_paths
-        ```
-
-        Then, restart your FISH terminal or run `source ~/.config/fish/config.fish`.
-
-**5. Install Dependencies with UV:**
-
-    ```bash
-    uv pip install -r requirements.txt
-    ```
-
-    If you don't have a `requirements.txt` file, you can install the dependencies directly:
-
-    ```bash
-    uv pip install PyQt6 qt_material huggingface_hub requests
-    ```
-
-### Installation with Pip (Alternative)
-
-If you prefer to use the standard `pip` package installer, you can follow these steps:
-
-**1. Prerequisites:**
-
-*   **Python 3.10 or higher:** Make sure you have Python installed on your system.
-
-**2. Clone the Repository:**
-
-    ```bash
-    git clone [YOUR_REPOSITORY_URL]
-    cd [YOUR_REPOSITORY_DIRECTORY]
-    ```
-
-    Replace `[YOUR_REPOSITORY_URL]` with the URL of your GitHub repository and `[YOUR_REPOSITORY_DIRECTORY]` with the name of the directory you cloned into.
-
-**3. Create a Virtual Environment:**
-
-    It's highly recommended to use a virtual environment to isolate the project's dependencies.
-
-    ```bash
-    python -m venv .venv
-    ```
-
-**4. Activate the Virtual Environment:**
-
-    *   **Bash/Zsh:**
-
-        ```bash
-        source .venv/bin/activate
-        ```
-
-    *   **FISH:**
-
-        ```fish
-        source .venv/bin/activate.fish
-        ```
-
-        **Important for FISH users:** You may need to manually add the virtual environment's `bin` directory to your `PATH` in your `~/.config/fish/config.fish` file:
-
-        ```fish
-        set -U fish_user_paths .venv/bin $fish_user_paths
-        ```
-
-        Then, restart your FISH terminal or run `source ~/.config/fish/config.fish`.
-
-**5. Install Dependencies with Pip:**
+5.  **Install Dependencies:**  Install the required Python packages using `pip`:
 
     ```bash
     pip install -r requirements.txt
     ```
 
-    If you don't have a `requirements.txt` file, you can install the dependencies directly:
+    > If you don't have a `requirements.txt` file, install the packages individually:
 
     ```bash
     pip install PyQt6 qt_material huggingface_hub requests
+    pip install Pyside6
     ```
 
-**Required Packages:**
-
-The following packages are required to run this tool:
-
-*   `PyQt6`
-*   `qt_material`
-*   `huggingface_hub`
-*   `requests`
-*   `Pyside6`
-
-**6. Run the Application:**
+6.  **Run the Application:**
 
     ```bash
     python hf_backup_tool/main.py
     ```
 
-## Configuration
+## 4. Configuration
 
-1.  **API Token:** You'll need a Hugging Face API token with "write" access. You can create one in your Hugging Face account settings ([https://huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)).
-2.  **Open the Configuration Dialog:** Click the "Edit Config (API Token)" button in the application.
-3.  **Enter Your API Token:** Paste your API token into the "Hugging Face API Token" field.
+Before using the tool, you need to configure it with your Hugging Face API token.
+
+**Steps:**
+
+1.  **Get an API Token:** If you don't have one, create a Hugging Face API token with "write" access.  You can do this in your Hugging Face account settings:  ([https://huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)).
+2.  **Open the Configuration Dialog:** Click the "Edit Config (API Token)" button within the application.
+3.  **Enter Your Token:** Paste your API token into the "Hugging Face API Token" field.
 4.  **Save the Configuration:** Click the "Save" button.
 
-## Issues 
+## 5. Issues & Known Limitations
 
-1. Currently is only allowing for ONE SINGULAR file to upload.
-2. Output isn't showing in the progress thing for uploading - you'll need to check terminal logs.
-3. MIGHT still crash on create repo.  Likely best to pre-make one, however it works with making a subfolder.
-4. SPACING issues still.
-5. Multiple file not really there
-6. Developing on a mac is hard, shut up.
+> This section lists some of the known limitations and areas for improvement.
 
-## Usage
+*   **Single File Upload (Currently):** The tool currently only supports uploading *one* file at a time.
+*   **Output Logging:**  Output and progress updates may currently be visible only in the terminal logs.
+*   **Repository Creation (Potential Issues):**  Creating a new repository might still have issues.  It's generally recommended to pre-create your repositories on the Hugging Face Hub.
+*   **Spacing and UI Glitches:**  There might still be some spacing or UI layout issues.
+*   **Multiple File Upload:** The GUI doesn't support multiple file uploads yet.
+*   **macOS Development Challenges:** Developing on macOS can be tricky (as you noted!).
 
-1.  **Select a Directory:** Choose the directory containing the files you want to back up.
-2.  **Choose a File Type:** Select the type of files you want to upload (e.g., SafeTensors, PyTorch Models).
-3.  **Select Files:** Select the files you want to upload from the list.
-4.  **Enter Repository Information:** Enter the owner (organization or username) and repository name.
+## 6. Usage
+
+Here's how to use the Hugging Face Backup Tool:
+
+**Steps:**
+
+1.  **Select a Directory:**  Click the "Select Directory" button, and choose the directory containing the files you want to back up.
+2.  **Choose a File Type:**  Use the "File Type" dropdown to select the type of files you want to upload (e.g., SafeTensors, PyTorch Models).
+3.  **Select Files:**  The file list will populate.  Select the files to upload.
+4.  **Enter Repository Information:**  Fill in the "Owner" (your organization or username) and "Repository" name.
 5.  **Click "Upload":** Start the upload process.
+6.  **Check Output:** Check the output window in the GUI for progress updates.
 
-## Contributing
+## 7. Contributing
 
-Contributions are welcome! Please feel free to submit pull requests or open issues.
+Contributions are very welcome! If you'd like to contribute, please:
 
-## License
+*   Submit pull requests with your improvements or bug fixes.
+*   Open issues to report bugs, request features, or suggest improvements.
 
-This project is licensed under the GNU General Public License v3.0. See the [LICENSE](LICENSE) file for details.
+## 8. License
 
-**A copy of the GNU General Public License v3.0 can be found at [https://www.gnu.org/licenses/gpl-3.0.en.html](https://www.gnu.org/licenses/gpl-3.0.en.html).**
+This project is licensed under the GNU General Public License v3.0.  See the [LICENSE](https://github.com/Ktiseos-Nyx/Huggingface-Desktop#GPL-3.0-1-ov-file) file for details.
+
+> **GNU General Public License v3.0:** ([https://www.gnu.org/licenses/gpl-3.0.en.html](https://www.gnu.org/licenses/gpl-3.0.en.html)).
