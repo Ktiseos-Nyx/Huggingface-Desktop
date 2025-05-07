@@ -1,6 +1,6 @@
 # Hugging Face Backup Tool
 
-A user-friendly desktop application for backing up your Hugging Face models, datasets, and spaces. This is in progress so some things may not be working 100% quite yet.
+A user-friendly desktop application for backing up your Hugging Face models, datasets, and spaces. This is in progress so some things may not be working 100% quite yet. Also the requirements and installation aren't as focused as they could be.
 
 [[_TOC_]]
 
@@ -8,9 +8,6 @@ A user-friendly desktop application for backing up your Hugging Face models, dat
 
 1.  [Overview](#overview)
     *   [Image, Video & Ascii Terminal Views](#image-video--ascii-terminal-views)
-        *   [Image & Overview Preview](#image--overview-preview)
-        *   [Video](#video)
-        *   [Ascii Cast](#ascii-cast)
     *   [Why use this tool instead of the command line?](#why-use-this-tool-instead-of-the-command-line)
 2.  [Features](#features)
 3.  [Installation](#installation)
@@ -216,6 +213,7 @@ The following packages are required to run this tool:
 *   `qt_material`
 *   `huggingface_hub`
 *   `requests`
+*   `Pyside6`
 
 **6. Run the Application:**
 
