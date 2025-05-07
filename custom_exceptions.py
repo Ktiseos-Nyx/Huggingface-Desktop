@@ -1,6 +1,7 @@
 # hf_backup_tool/exceptions/custom_exceptions.py
 # Custom exception classes for the Hugging Face Backup Tool.
 
+
 class APIKeyError(Exception):
     """
     Raised when there's an issue with the API key.
@@ -10,6 +11,7 @@ class APIKeyError(Exception):
         - API key does not have the required permissions.
         - API key has been revoked.
     """
+
     pass
 
 
@@ -23,6 +25,7 @@ class UploadError(Exception):
         - File size exceeds the maximum allowed limit.
         - Invalid file format.
     """
+
     pass
 
 
@@ -35,6 +38,7 @@ class ConfigError(Exception):
         - Required configuration settings are missing.
         - Invalid configuration values.
     """
+
     pass
 
 
@@ -46,6 +50,7 @@ class RateLimitError(Exception):
         - Making too many API requests in a short period of time.
         - Not implementing proper rate limiting mechanisms.
     """
+
     pass
 
 
@@ -58,6 +63,7 @@ class AuthenticationError(Exception):
         - Incorrect username or password (if applicable).
         - Account is locked or disabled.
     """
+
     pass
 
 
@@ -70,4 +76,5 @@ class RepositoryError(Exception):
         - Insufficient permissions to access the repository.
         - Repository is corrupted or unavailable.
     """
+
     pass
