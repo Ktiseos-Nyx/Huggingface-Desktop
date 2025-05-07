@@ -2,6 +2,7 @@
 
 A user-friendly desktop application for backing up your Hugging Face models, datasets, and spaces. This is in progress so some things may not be working 100% quite yet.
 
+[TOC]
 
 ## Overview
 
@@ -10,6 +11,10 @@ This tool provides a graphical user interface (GUI) for interacting with the Hug
 *   **Upload files and folders:** Quickly back up your local models, datasets, and spaces to the Hugging Face Hub.
 *   **Manage repositories:** Organize your backups into different repositories.
 *   **Configure settings:** Easily set your API token, proxy settings, and rate limit delay.
+
+<details>
+
+<summary>Image, Video & Ascii Terminal Views</summary>
 
 ### Image & Overview Preview
 
@@ -22,7 +27,7 @@ https://github.com/user-attachments/assets/67105f33-4f13-438e-91b3-f029b9e80066
 ![718285](https://github.com/user-attachments/assets/8ccf5fb2-c36f-4e28-995e-6bb1b80886eb)
 
 See the recording on [asciinema.org](https://asciinema.org/a/O3X0ubf8j9ZClIfZKas25mkSp).
-
+</details>
 
 **Why use this tool instead of the command line?**
 
