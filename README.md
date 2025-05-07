@@ -3,6 +3,35 @@
 A user-friendly desktop application for backing up your Hugging Face models, datasets, and spaces. This is in progress so some things may not be working 100% quite yet.
 
 [TOC]
+## Table of Contents
+
+1.  [Overview](#overview)
+    *   [Image, Video & Ascii Terminal Views](#image-video--ascii-terminal-views)
+        *   [Image & Overview Preview](#image--overview-preview)
+        *   [Video](#video)
+        *   [Ascii Cast](#ascii-cast)
+    *   [Why use this tool instead of the command line?](#why-use-this-tool-instead-of-the-command-line)
+2.  [Features](#features)
+3.  [Installation](#installation)
+    *   [Compatible Operating Systems (Theoretical)](#compatible-operating-systems-theoretical)
+    *   [Installation with UV (Recommended)](#installation-with-uv-recommended)
+        *   [1. Prerequisites:](#1-prerequisites)
+        *   [2. Clone the Repository:](#2-clone-the-repository)
+        *   [3. Create a Virtual Environment:](#3-create-a-virtual-environment)
+        *   [4. Activate the Virtual Environment:](#4-activate-the-virtual-environment)
+        *   [5. Install Dependencies with UV:](#5-install-dependencies-with-uv)
+    *   [Installation with Pip (Alternative)](#installation-with-pip-alternative)
+        *   [1. Prerequisites:](#1-prerequisites-1)
+        *   [2. Clone the Repository:](#2-clone-the-repository-1)
+        *   [3. Create a Virtual Environment:](#3-create-a-virtual-environment-1)
+        *   [4. Activate the Virtual Environment:](#4-activate-the-virtual-environment-1)
+        *   [5. Install Dependencies with Pip:](#5-install-dependencies-with-pip)
+        *   [Required Packages:](#required-packages)
+        *   [6. Run the Application:](#6-run-the-application)
+4.  [Configuration](#configuration)
+5.  [Usage](#usage)
+6.  [Contributing](#contributing)
+7.  [License](#license)
 
 ## Overview
 
