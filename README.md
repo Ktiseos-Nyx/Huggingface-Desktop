@@ -2,7 +2,8 @@
 
 A user-friendly desktop application for backing up your Hugging Face models, datasets, and spaces. This is in progress so some things may not be working 100% quite yet.
 
-[TOC]
+[[_TOC_]]
+
 ## Table of Contents
 
 1.  [Overview](#overview)
@@ -41,11 +42,12 @@ This tool provides a graphical user interface (GUI) for interacting with the Hug
 *   **Manage repositories:** Organize your backups into different repositories.
 *   **Configure settings:** Easily set your API token, proxy settings, and rate limit delay.
 
+### Image & Overview Preview
 <details>
 
 <summary>Image, Video & Ascii Terminal Views</summary>
 
-### Image & Overview Preview
+
 
 <img width="803" alt="Screenshot 2025-05-06 at 11 28 13" src="https://github.com/user-attachments/assets/aaad7468-3fa3-4c68-93c1-21b2cf09ff8e" />
 
