@@ -27,7 +27,7 @@ A user-friendly desktop application for backing up your Hugging Face models, dat
         *   [Required Packages:](#required-packages)
         *   [6. Run the Application:](#6-run-the-application)
 4.  [Configuration](#configuration)
-5.  [Issues][#issues]
+5.  [Issues](#issues)
 6.  [Usage](#usage)
 7.  [Contributing](#contributing)
 8.  [License](#license)
