@@ -1,7 +1,9 @@
-[![](https://dcbadge.limes.pink/api/server/INVITE)](https://discord.gg/MASBKnNFWh) [![view - Documentation](https://img.shields.io/badge/view-Documentation-blue?style=for-the-badge)](/docs/ "Go to project documentation") [![contributions - welcome](https://img.shields.io/badge/contributions-welcome-blue)](/CONTRIBUTING.md "Go to contributions doc") [![Made with Python](https://img.shields.io/badge/Python->=3.10-blue?logo=python&logoColor=white)](https://python.org "Go to Python homepage") 
+[![Made with Python](https://img.shields.io/badge/Python->=3.10-blue?logo=python&logoColor=white)](https://python.org "Go to Python homepage") 
 # Hugging Face Backup Tool
 
 A user-friendly desktop application for backing up your Hugging Face models, datasets, and spaces.
+
+[Connect with us on Discord](https://discord.gg/MASBKnNFWh)
 
 ## Table of Contents
 
@@ -15,6 +17,8 @@ A user-friendly desktop application for backing up your Hugging Face models, dat
 6.  [Usage](#usage)
 7.  [Contributing](#contributing)
 8.  [License](#license)
+9.  [![view - Documentation](https://img.shields.io/badge/view-Documentation-blue?style=for-the-badge)](/docs/ "Go to project documentation")
+10.  [![contributions - welcome](https://img.shields.io/badge/contributions-welcome-blue)](/CONTRIBUTING.md "Go to contributions doc") 
 
 ## 1. Overview
 
