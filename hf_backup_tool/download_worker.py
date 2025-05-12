@@ -9,7 +9,6 @@ from huggingface_hub import (
 )
 from huggingface_hub.utils import HfHubHTTPError, RepositoryNotFoundError, RevisionNotFoundError
 from config_manager import get_api_token
-from token_utils import deobfuscate_token
 
 
 logger = logging.getLogger(__name__)
@@ -232,15 +231,10 @@ class DownloadWorkerThread(QThread):
 
         self.status_update.emit(self.task.id, f"Parsed: Repo ID: {repo_id}, Type: {repo_type}, Revision: {revision}, Folder: '{folder_path_in_repo or './'}'")
 
-        token = get_api_token()
-        deobfuscated_token = None
-        if token:
-            deobfuscated_token = deobfuscate_token(token)
-            if not deobfuscated_token:
-                self.status_update.emit(self.task.id, "Warning: Failed to deobfuscate API token. Private repos may fail.")
+        token = get_api_token() 
         
         try:
-            self._perform_download_operations(repo_id, repo_type, revision, folder_path_in_repo, deobfuscated_token)
+            self._perform_download_operations(repo_id, repo_type, revision, folder_path_in_repo, token)
         except Exception as e:
             self.task.status = "Failed"
             error_message = f"A critical unexpected error occurred: {e}"
