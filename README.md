@@ -87,7 +87,7 @@ Here are the general steps for installing the tool.
 3.  **Create a Virtual Environment (Recommended):**  It's best practice to use a virtual environment.  This isolates the project's dependencies.
 
     ```bash
-    python -m venv .venv
+    python -m venv venv
     ```
 
 4.  **Activate the Virtual Environment:**
@@ -95,19 +95,19 @@ Here are the general steps for installing the tool.
     *   **Windows:**
 
         ```cmd
-        .venv\Scripts\activate
+        venv\Scripts\activate
         ```
 
     *   **Linux/macOS (Bash/Zsh):**
 
         ```bash
-        source .venv/bin/activate
+        source venv/bin/activate
         ```
 
     *   **FISH:**
 
         ```fish
-        source .venv/bin/activate.fish
+        source venv/bin/activate.fish
         ```
 
 5.  **Install Dependencies:**  Install the required Python packages using `pip`:
@@ -115,18 +115,11 @@ Here are the general steps for installing the tool.
     ```bash
     pip install -r requirements.txt
     ```
-
-    > If you don't have a `requirements.txt` file, install the packages individually:
-
-    ```bash
-    pip install PyQt6 qt_material huggingface_hub requests
-    pip install Pyside6
-    ```
-
+ 
 6.  **Run the Application:**
 
     ```bash
-    python hf_backup_tool/main.py
+    python launch.py
     ```
 
 ## 4. Configuration
