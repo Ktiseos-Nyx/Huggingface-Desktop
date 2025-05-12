@@ -24,6 +24,8 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+*.ini
+/hf_backup_tool/config.ini
 MANIFEST
 
 # PyInstaller
