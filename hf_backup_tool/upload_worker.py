@@ -43,7 +43,7 @@ class UploadWorker(QThread):
             repo_id = f"{self.repo_owner}/{self.repo_name}"
             if self.repo_exists:
                 try:
-                    api.repo_info(repo_id)
+                    api.repo_info(repo_id, repo_type=self.repo_type)
                     self.output_signal.emit(f"✅ Repository '{repo_id}' found.")
                 except Exception as e:
                     self.output_signal.emit(

@@ -20,8 +20,9 @@ from PyQt6.QtWidgets import (
     QScrollArea,
     QSizePolicy,
 )
-from hf_uploader_thread import HFUploaderThread
-from config_manager import config, get_api_token, save_config
+from PyQt6.QtCore import QTimer
+from upload_worker import UploadWorker
+from config_manager import config, get_api_token, save_config, get_max_concurrent_upload_jobs
 from config_dialog import ConfigDialog
 
 logger = logging.getLogger(__name__)
@@ -31,8 +32,24 @@ class HuggingFaceUploader(QWidget):
         super().__init__()
         self.setWindowTitle("Hugging Face Uploader")
         self.current_directory = os.getcwd()
-        self.uploader_thread = None
         self.config_dialog = None
+        
+        self.active_workers = []
+        self.upload_queue = []
+        self.worker_file_map = {} # Maps worker object to its file_path for context
+        self.total_files_to_upload = 0
+        self.files_processed_count = 0
+        self.files_succeeded_count = 0
+        self.max_concurrent_jobs = 1
+        self.repo_id_for_upload = ""
+        self.repo_type_for_upload = ""
+        self.repo_folder_for_upload = ""
+        self.commit_msg_for_upload = ""
+        self.create_pr_for_upload = False
+        self.api_token_for_upload = ""
+        self._is_upload_active = False # Flag to manage overall upload state
+        self._cancel_requested = False
+
         self.init_ui()
 
     def init_ui(self):
@@ -292,6 +309,10 @@ class HuggingFaceUploader(QWidget):
             self.output_text.append(f"❌ Error listing files: {str(e)}")
 
     def start_upload(self):
+        if self._is_upload_active:
+            QMessageBox.warning(self, "Upload In Progress", "An upload operation is already in progress.")
+            return
+
         org_name = self.org_input.text().strip()
         repo_name = self.repo_input.text().strip()
 
@@ -300,7 +321,7 @@ class HuggingFaceUploader(QWidget):
             self.output_text.append("❗ Owner and Repository Name are required.")
             return
 
-        repo_id = f"{org_name}/{repo_name}"
+        self.repo_id_for_upload = f"{org_name}/{repo_name}"
         
         selected_list_items = self.file_list.selectedItems()
         if not selected_list_items:
@@ -309,88 +330,177 @@ class HuggingFaceUploader(QWidget):
             return
 
         selected_file_basenames = [item.text() for item in selected_list_items]
-        selected_full_paths = [os.path.join(self.current_directory, basename) for basename in selected_file_basenames]
+        self.upload_queue = [os.path.join(self.current_directory, basename) for basename in selected_file_basenames]
+        self.total_files_to_upload = len(self.upload_queue)
+        self.files_processed_count = 0
+        self.files_succeeded_count = 0
+        self._is_upload_active = True
+        self._cancel_requested = False
 
-        repo_type = self.repo_type_dropdown.currentText()
-        repo_folder = self.repo_folder_input.text().strip('/')
-        commit_msg = self.commit_message_input.toPlainText()
+        self.repo_type_for_upload = self.repo_type_dropdown.currentText()
+        self.repo_folder_for_upload = self.repo_folder_input.text().strip('/')
+        self.commit_msg_for_upload = self.commit_message_input.toPlainText()
+        self.create_pr_for_upload = self.create_pr_checkbox.isChecked()
         
+        self.api_token_for_upload = get_api_token()
+        if not self.api_token_for_upload:
+            self.output_text.append("❌ API token not configured. Please set it via Edit Config.")
+            QMessageBox.critical(self, "API Token Missing", "API token is not configured.")
+            self._is_upload_active = False
+            return
+
         try:
-            rate_limit_delay = float(config.get("HuggingFace", "rate_limit_delay", fallback="1.0"))
+            self.max_concurrent_jobs = int(get_max_concurrent_upload_jobs())
+            if self.max_concurrent_jobs <= 0:
+                self.max_concurrent_jobs = 1
         except ValueError:
-            rate_limit_delay = 1.0
-            self.output_text.append("⚠️ Invalid rate limit delay in config, defaulting to 1.0s.")
+            self.max_concurrent_jobs = 1
+            self.output_text.append("⚠️ Invalid max concurrent upload jobs in config, defaulting to 1.")
 
         if self.check_repo_exists_checkbox.isChecked():
-            exists = self.repo_exists_on_hub(repo_id, repo_type)
+            exists = self.repo_exists_on_hub(self.repo_id_for_upload, self.repo_type_for_upload)
             if not exists:
                 if self.create_repo_checkbox.isChecked():
-                    self.output_text.append(f"ℹ️ Repository {repo_id} not found. Attempting to create it...")
-                    if not self.create_repo_on_hub(repo_id, repo_type):
-                        self.output_text.append(f"❌ Failed to create repository {repo_id}. Aborting upload.")
-                        QMessageBox.critical(self, "Repo Creation Failed", f"Could not create repository {repo_id}.")
+                    self.output_text.append(f"ℹ️ Repository {self.repo_id_for_upload} not found. Attempting to create it...")
+                    if not self.create_repo_on_hub(self.repo_id_for_upload, self.repo_type_for_upload):
+                        self.output_text.append(f"❌ Failed to create repository {self.repo_id_for_upload}. Aborting upload.")
+                        QMessageBox.critical(self, "Repo Creation Failed", f"Could not create repository {self.repo_id_for_upload}.")
+                        self._is_upload_active = False
                         return
-                    self.output_text.append(f"✅ Repository {repo_id} created successfully.")
+                    self.output_text.append(f"✅ Repository {self.repo_id_for_upload} created successfully.")
                 else:
-                    self.output_text.append(f"❗ Repository {repo_id} does not exist and creation is not enabled. Aborting.")
-                    QMessageBox.warning(self, "Repo Not Found", f"Repository {repo_id} does not exist and 'Create Repo' is not checked.")
+                    self.output_text.append(f"❗ Repository {self.repo_id_for_upload} does not exist and creation is not enabled. Aborting.")
+                    QMessageBox.warning(self, "Repo Not Found", f"Repository {self.repo_id_for_upload} does not exist and 'Create Repo' is not checked.")
+                    self._is_upload_active = False
                     return
         
         self.upload_button.setEnabled(False)
         self.cancel_button.setEnabled(True)
         self.progress_bar.setValue(0)
         self.progress_percent_label.setText("0%")
+        self.progress_label.setText("Status: Starting uploads...")
+        self.output_text.append(f"🚀 Starting parallel upload of {self.total_files_to_upload} files to {self.repo_id_for_upload} (max {self.max_concurrent_jobs} jobs)...")
+        
+        self._launch_next_workers()
 
-        self.uploader_thread = HFUploaderThread(
-            repo_id=repo_id,
-            selected_files=selected_full_paths,
-            repo_type=repo_type,
-            repo_folder=repo_folder,
-            current_directory=self.current_directory,
-            commit_msg=commit_msg,
-            create_pr=self.create_pr_checkbox.isChecked(),
-            rate_limit_delay=rate_limit_delay,
-            task_id=repo_id
-        )
-        self.uploader_thread.signal_status.connect(self.update_status)
-        self.uploader_thread.signal_progress.connect(self.update_progress)
-        self.uploader_thread.signal_output.connect(self.update_output)
-        self.uploader_thread.signal_finished.connect(self.upload_finished)
-        self.uploader_thread.start()
-        self.output_text.append(f"🚀 Starting upload of {len(selected_full_paths)} files to {repo_id}...")
+    def _launch_next_workers(self):
+        if self._cancel_requested:
+            return
 
-    def cancel_upload(self):
-        if self.uploader_thread and self.uploader_thread.isRunning():
-            self.output_text.append("🔄 Attempting to forcibly terminate upload...")
-            self.uploader_thread.terminate()
-            self.output_text.append("🛑 Upload termination signal sent.")
-        else:
-            self.output_text.append("ℹ️ No active upload to cancel.")
-        self.upload_button.setEnabled(True)
-        self.cancel_button.setEnabled(False)
+        while len(self.active_workers) < self.max_concurrent_jobs and self.upload_queue:
+            file_to_upload = self.upload_queue.pop(0)
+            
+            worker = UploadWorker(
+                api_token=self.api_token_for_upload,
+                repo_owner=self.repo_id_for_upload.split('/')[0],
+                repo_name=self.repo_id_for_upload.split('/')[1],
+                file_path=file_to_upload,
+                commit_message=self.commit_msg_for_upload,
+                repo_type=self.repo_type_for_upload,
+                repo_folder=self.repo_folder_for_upload,
+                upload_type="File",
+                create_repo=False, 
+                repo_exists=True 
+            )
+            worker.output_signal.connect(self._handle_worker_output)
+            worker.finished_signal.connect(lambda success, worker_instance=worker, fp=file_to_upload: self._handle_worker_finished(worker_instance, fp, success))
+            
+            self.active_workers.append(worker)
+            self.worker_file_map[worker] = file_to_upload 
+            worker.start()
+            self.output_text.append(f"⏳ Worker started for: {os.path.basename(file_to_upload)}")
+
+        if not self.active_workers and not self.upload_queue and self._is_upload_active:
+            self._finalize_upload_process()
 
 
-    def update_status(self, task_id, message):
-        self.progress_label.setText(f"Status: {message}")
-
-    def update_progress(self, task_id, value):
-        self.progress_bar.setValue(value)
-        self.progress_percent_label.setText(f"{value}%")
-
-    def update_output(self, task_id, message):
+    def _handle_worker_output(self, message):
         self.output_text.append(message)
 
-    def upload_finished(self, task_id, success, final_message):
+    def _handle_worker_finished(self, worker, file_path, success):
+        self.files_processed_count += 1
+        if success:
+            self.files_succeeded_count += 1
+        
+        if worker in self.active_workers:
+            self.active_workers.remove(worker)
+        if worker in self.worker_file_map:
+            del self.worker_file_map[worker]
+
+        self._update_overall_progress()
+
+        if self._cancel_requested:
+            if not self.active_workers:
+                self._finalize_upload_process()
+            return
+
+        if self.upload_queue or self.active_workers:
+            self._launch_next_workers()
+        else: # No more files in queue and no active workers
+            self._finalize_upload_process()
+            
+    def _update_overall_progress(self):
+        if self.total_files_to_upload > 0:
+            progress_percent = int((self.files_processed_count / self.total_files_to_upload) * 100)
+            self.progress_bar.setValue(progress_percent)
+            self.progress_percent_label.setText(f"{progress_percent}%")
+            self.progress_label.setText(f"Status: Processed {self.files_processed_count}/{self.total_files_to_upload}. Active: {len(self.active_workers)}")
+        else:
+            self.progress_bar.setValue(0)
+            self.progress_percent_label.setText("0%")
+
+    def _finalize_upload_process(self):
+        self._is_upload_active = False
         self.upload_button.setEnabled(True)
         self.cancel_button.setEnabled(False)
-        self.progress_label.setText(f"Status: {final_message}")
-        if success:
+        
+        final_message = ""
+        if self._cancel_requested:
+            final_message = f"🛑 Upload cancelled. {self.files_succeeded_count}/{self.total_files_to_upload} files uploaded."
+            self.output_text.append(final_message)
+        elif self.files_succeeded_count == self.total_files_to_upload and self.total_files_to_upload > 0:
+            final_message = f"🎉 All {self.total_files_to_upload} files uploaded successfully to {self.repo_id_for_upload}."
             self.progress_bar.setValue(100)
             self.progress_percent_label.setText("100%")
-        if self.clear_after_checkbox.isChecked() and success:
-            self.output_text.append("Clearing log as per setting...")
-        logger.info(f"Upload task {task_id} finished. Success: {success}. Message: {final_message}")
+            self.output_text.append(final_message)
+        elif self.total_files_to_upload > 0:
+            final_message = f"⚠️ Upload complete with errors. {self.files_succeeded_count}/{self.total_files_to_upload} files uploaded to {self.repo_id_for_upload}."
+            self.output_text.append(final_message)
+        else: # No files were selected or processed
+            final_message = "No files processed."
+            self.output_text.append(final_message)
+            
+        self.progress_label.setText(f"Status: {final_message}")
+        logger.info(f"Upload task to {self.repo_id_for_upload} finished. Succeeded: {self.files_succeeded_count}/{self.total_files_to_upload}. Cancelled: {self._cancel_requested}")
 
+        if self.clear_after_checkbox.isChecked() and self.files_succeeded_count == self.total_files_to_upload and not self._cancel_requested:
+             QTimer.singleShot(2000, self.clear_output)
+
+
+    def cancel_upload(self):
+        if not self._is_upload_active:
+            self.output_text.append("ℹ️ No active upload to cancel.")
+            return
+
+        self.output_text.append("🔄 Requesting cancellation of uploads...")
+        self._cancel_requested = True
+        
+        # Terminate active QThreads. UploadWorker does not have a graceful stop.
+        for worker in list(self.active_workers): # Iterate over a copy
+            if worker.isRunning():
+                worker.terminate() # Forcible stop
+                # worker.wait() # Optionally wait, but terminate is usually immediate
+                self.output_text.append(f"🛑 Worker for {os.path.basename(self.worker_file_map.get(worker, 'unknown file'))} termination signal sent.")
+        
+        self.active_workers.clear()
+        self.upload_queue.clear()
+
+        # If no workers were active or they terminated quickly, finalize.
+        # Otherwise, _handle_worker_finished will eventually call _finalize_upload_process.
+        if not self.active_workers:
+             QTimer.singleShot(100, self._finalize_upload_process) # Use a short delay to allow UI to update
+        
+        self.cancel_button.setEnabled(False) # Disable cancel button once pressed
 
     def clear_output(self):
         self.output_text.clear()
@@ -439,15 +549,14 @@ class HuggingFaceUploader(QWidget):
             return False
 
     def closeEvent(self, event):
-        if self.uploader_thread and self.uploader_thread.isRunning():
+        if self._is_upload_active:
             reply = QMessageBox.question(self, 'Confirm Exit',
-                                         "An upload is in progress. Are you sure you want to exit? This will cancel the upload.",
+                                         "An upload is in progress. Are you sure you want to exit? This will attempt to cancel the ongoing uploads.",
                                          QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
                                          QMessageBox.StandardButton.No)
             if reply == QMessageBox.StandardButton.Yes:
                 self.cancel_upload()
-                self.uploader_thread.wait()
-                event.accept()
+                QTimer.singleShot(500, event.accept)
             else:
                 event.ignore()
         else:
