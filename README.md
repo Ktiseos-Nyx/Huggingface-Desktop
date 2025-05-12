@@ -1,4 +1,4 @@
-[![Made with Python](https://img.shields.io/badge/Python->=3.10-blue?logo=python&logoColor=white)](https://python.org "Go to Python homepage") 
+[![Made with Python](https://img.shields.io/badge/Python->=3.10-blue?logo=python&logoColor=white)](https://python.org "Go to Python homepage") [![CodeQL](https://github.com/Ktiseos-Nyx/Huggingface-Desktop/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Ktiseos-Nyx/Huggingface-Desktop/actions/workflows/github-code-scanning/codeql)
 # Hugging Face Backup Tool
 
 A user-friendly desktop application for backing up your Hugging Face models, datasets, and spaces.
