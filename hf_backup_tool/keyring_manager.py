@@ -2,12 +2,9 @@ import keyring
 import logging
 
 logger = logging.getLogger(__name__)
-
-KEYRING_SERVICE_NAME = "huggingface_backup"  # Consistent service name
-
+KEYRING_SERVICE_NAME = "huggingface_backup"
 
 def get_api_token(alias):
-    """Retrieves the API token from the system keyring."""
     try:
         api_token = keyring.get_password(KEYRING_SERVICE_NAME, alias)
         if api_token:
@@ -22,18 +19,14 @@ def get_api_token(alias):
         )
         return None
 
-
 def set_api_token(alias, token):
-    """Stores the API token securely in the system keyring."""
     try:
         keyring.set_password(KEYRING_SERVICE_NAME, alias, token)
         logger.info(f"Successfully stored API token for alias: {alias}")
     except Exception as e:
         logger.error(f"Error setting API token for alias {alias}: {e}", exc_info=True)
 
-
 def delete_api_token(alias):
-    """Deletes the API token from the system keyring."""
     try:
         keyring.delete_password(KEYRING_SERVICE_NAME, alias)
         logger.info(f"Successfully deleted API token for alias: {alias}")

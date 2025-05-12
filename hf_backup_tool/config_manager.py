@@ -1,54 +1,53 @@
-# config_manager.py
 import configparser
 import os
 import logging
-from custom_exceptions import ConfigError  # Import ConfigError
+from custom_exceptions import ConfigError
+from hf_backup_tool.token_utils import obfuscate_token, deobfuscate_token
 
 logger = logging.getLogger(__name__)
-
 config = configparser.ConfigParser()
 config_path = os.path.expanduser("~/.huggingface_uploader_config.ini")
-
 DEFAULT_CONFIG = {
-     "HuggingFace": {
-         "api_token": "",  # Store obfuscated API token
-         "rate_limit_delay": "1",  # Delay in seconds between API calls
-         "org": "",  # Store org or user
-         "repo": "",  # Store repo name
-     },
-     "Zip": {"default_zip_name": "my_archive"},
-     "Proxy": {
-         "use_proxy": "False",  # Whether to use a proxy server
-         "http": "",  # HTTP proxy URL
-         "https": "",  # HTTPS proxy URL
-     },
+    "HuggingFace": {
+        "api_token": "",
+        "rate_limit_delay": "1",
+        "org": "",
+        "repo": "",
+    },
+    "Zip": {"default_zip_name": "my_archive"},
+    "Proxy": {
+        "use_proxy": "False",
+        "http": "",
+        "https": "",
+    },
+    "DownloadQueue": {
+        "max_concurrent_downloads": "1",
+        "auto_clear_completed_downloads": "True"
+    },
+    "UploadQueue": {
+        "max_concurrent_upload_jobs": "1",
+        "auto_clear_completed_uploads": "True"
+    }
 }
 
 def load_config():
-    """Loads the configuration from the config file.
-
-    If the config file does not exist, it creates a default config.
-    Raises ConfigError if the config can't be loaded.
-    """
     logger.info("Loading configuration...")
     if os.path.exists(config_path):
         logger.info(f"Configuration file found: {config_path}")
         try:
             config.read(config_path)
             logger.info("Configuration loaded successfully.")
-            # *** DEBUGGING ***
             logger.debug(f"Config contents after loading: {config.items()}")
-
         except Exception as e:
             logger.error(f"Error reading configuration file: {e}", exc_info=True)
             raise ConfigError(
                 f"Failed to load configuration from {config_path}: {e}"
-            ) from e  # Re-raise config error
+            ) from e
     else:
         logger.warning(
             f"Configuration file not found: {config_path}. Creating default config."
         )
-        config.read_dict(DEFAULT_CONFIG)  # Apply default config
+        config.read_dict(DEFAULT_CONFIG)
         try:
             save_config()
             logger.info(f"Default configuration created: {config_path}")
@@ -59,63 +58,101 @@ def load_config():
             raise ConfigError("Failed to create default configuration.") from save_error
     return config
 
-
 def save_config():
-    """Saves the configuration to the config file.
-
-    Raises ConfigError on failure.
-    """
     logger.info("Saving configuration...")
     try:
         with open(config_path, "w") as configfile:
             config.write(configfile)
         logger.info("Configuration saved successfully.")
-        # *** DEBUGGING ***
         logger.debug(f"Config contents after saving: {config.items()}")
-        return True  # Indicate success
+        return True
     except Exception as e:
         logger.error(f"Error saving configuration: {e}", exc_info=True)
         raise ConfigError(
             f"Failed to save configuration to {config_path}: {e}"
-        ) from e  # Re-raise the config error
+        ) from e
 
-# --- Convenience methods ---
 def get_api_token():
-    """Gets the Hugging Face API token from the configuration."""
-    if token := os.environ.get("HF_API_TOKEN"):
-        return token
-    return config.get("HuggingFace", "api_token") # Corrected - Removed the extra default argument ""
+    clear_token_from_env = os.environ.get("HF_API_TOKEN")
+    if clear_token_from_env:
+        logger.debug("Using API token from HF_API_TOKEN environment variable.")
+        return clear_token_from_env
+    
+    obfuscated_token_from_config = config.get("HuggingFace", "api_token", fallback="")
+    if obfuscated_token_from_config:
+        logger.debug("Found API token in config, deobfuscating.")
+        return deobfuscate_token(obfuscated_token_from_config)
+    
+    logger.debug("No API token found in environment or config.")
+    return ""
 
 def set_api_token(token):
-    """Sets the Hugging Face API token in the configuration."""
-    config.set("HuggingFace", "api_token", token)
+    if not config.has_section("HuggingFace"):
+        config.add_section("HuggingFace")
+    obfuscated_api_token = obfuscate_token(token)
+    config.set("HuggingFace", "api_token", obfuscated_api_token)
     save_config()
 
 def get_rate_limit_delay():
-    """Gets the rate limit delay in seconds."""
     return float(config.get("HuggingFace", "rate_limit_delay", fallback="1"))
 
 def set_rate_limit_delay(delay):
-    """Sets the rate limit delay in seconds."""
-    config.set("HuggingFace", "rate_limit_delay", str(delay)) # Save as string
+    if not config.has_section("HuggingFace"):
+        config.add_section("HuggingFace")
+    config.set("HuggingFace", "rate_limit_delay", str(delay))
     save_config()
 
 def set_proxy(proxy_settings):
-    """Sets proxy settings in the configuration."""
+    if not config.has_section("Proxy"):
+        config.add_section("Proxy")
     config.set("Proxy", "use_proxy", proxy_settings.get("use_proxy", "False"))
     config.set("Proxy", "http", proxy_settings.get("http", ""))
     config.set("Proxy", "https", proxy_settings.get("https", ""))
-    save_config()  # save the config
+    save_config()
 
 def get_proxy():
-    """Gets the proxy settings from the configuration."""
     return {
         "use_proxy": config.get("Proxy", "use_proxy", fallback="False"),
         "http": config.get("Proxy", "http", fallback=""),
         "https": config.get("Proxy", "https", fallback=""),
     }
-# --- Load the configuration when the module is imported ---
+
+def get_max_concurrent_downloads():
+    return int(config.get("DownloadQueue", "max_concurrent_downloads", fallback="1"))
+
+def set_max_concurrent_downloads(max_downloads):
+    if not config.has_section("DownloadQueue"):
+        config.add_section("DownloadQueue")
+    config.set("DownloadQueue", "max_concurrent_downloads", str(max_downloads))
+    save_config()
+
+def get_auto_clear_completed_downloads():
+    return config.getboolean("DownloadQueue", "auto_clear_completed_downloads", fallback=True)
+
+def set_auto_clear_completed_downloads(auto_clear):
+    if not config.has_section("DownloadQueue"):
+        config.add_section("DownloadQueue")
+    config.set("DownloadQueue", "auto_clear_completed_downloads", str(auto_clear))
+    save_config()
+
+def get_max_concurrent_upload_jobs():
+    return int(config.get("UploadQueue", "max_concurrent_upload_jobs", fallback="1"))
+
+def set_max_concurrent_upload_jobs(max_jobs):
+    if not config.has_section("UploadQueue"):
+        config.add_section("UploadQueue")
+    config.set("UploadQueue", "max_concurrent_upload_jobs", str(max_jobs))
+    save_config()
+
+def get_auto_clear_completed_uploads():
+    return config.getboolean("UploadQueue", "auto_clear_completed_uploads", fallback=True)
+
+def set_auto_clear_completed_uploads(auto_clear):
+    if not config.has_section("UploadQueue"):
+        config.add_section("UploadQueue")
+    config.set("UploadQueue", "auto_clear_completed_uploads", str(auto_clear))
+    save_config()
 try:
-    load_config()  # Load config when module is imported
+    load_config()
 except ConfigError as e:
     logger.error(f"Initial config load failed: {e}")

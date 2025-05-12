@@ -1,13 +1,12 @@
-from PyQt6.QtCore import QThread, pyqtSignal, Qt
+from PyQt6.QtCore import QThread, pyqtSignal
 from huggingface_hub import HfApi, create_repo, upload_file, upload_folder
 import os
 from custom_exceptions import UploadError, APIKeyError
 
-
-class UploadWorker(QThread):  # Separate class for background upload
+class UploadWorker(QThread):
     progress_signal = pyqtSignal(int)
     output_signal = pyqtSignal(str)
-    finished_signal = pyqtSignal(bool)  # Added signal for finish status
+    finished_signal = pyqtSignal(bool)
 
     def __init__(
         self,
@@ -40,10 +39,8 @@ class UploadWorker(QThread):  # Separate class for background upload
         try:
             if not self.api_token:
                 raise APIKeyError("API token not found in configuration.")
-
             api = HfApi(token=self.api_token)
             repo_id = f"{self.repo_owner}/{self.repo_name}"
-
             if self.repo_exists:
                 try:
                     api.repo_info(repo_id)
@@ -52,9 +49,8 @@ class UploadWorker(QThread):  # Separate class for background upload
                     self.output_signal.emit(
                         f"❌ Repository '{repo_id}' not found. Error: {str(e)}"
                     )
-                    self.finished_signal.emit(False)  # Signal upload failed
+                    self.finished_signal.emit(False)
                     return
-
             if self.create_repo:
                 try:
                     create_repo(
@@ -62,7 +58,7 @@ class UploadWorker(QThread):  # Separate class for background upload
                         repo_type=self.repo_type,
                         token=self.api_token,
                         private=False,
-                    )  # or True if user selects private
+                    )
                     self.output_signal.emit(
                         f"✅ Repository '{repo_id}' created successfully."
                     )
@@ -70,9 +66,8 @@ class UploadWorker(QThread):  # Separate class for background upload
                     self.output_signal.emit(
                         f"❌ Failed to create repository '{repo_id}'. Error: {str(e)}"
                     )
-                    self.finished_signal.emit(False)  # Signal upload failed
+                    self.finished_signal.emit(False)
                     return
-
             if self.upload_type == "File":
                 if not self.file_path:
                     raise UploadError("No file selected for upload.")
@@ -82,7 +77,6 @@ class UploadWorker(QThread):  # Separate class for background upload
                         upload_path = os.path.join(self.repo_folder, filename)
                     else:
                         upload_path = filename
-
                     upload_file(
                         path_or_fileobj=self.file_path,
                         path_in_repo=upload_path,
@@ -99,11 +93,9 @@ class UploadWorker(QThread):  # Separate class for background upload
                     self.output_signal.emit(f"❌ File upload failed. Error: {str(e)}")
                     self.finished_signal.emit(False)
                     return
-
             elif self.upload_type == "Folder":
                 if not self.folder_path:
                     raise UploadError("No folder selected for upload.")
-
                 try:
                     upload_folder(
                         folder_path=self.folder_path,
@@ -119,15 +111,13 @@ class UploadWorker(QThread):  # Separate class for background upload
                     self.output_signal.emit(f"❌ Folder upload failed. Error: {str(e)}")
                     self.finished_signal.emit(False)
                     return
-
-            self.finished_signal.emit(True)  # Signal upload completed successfully
-
+            self.finished_signal.emit(True)
         except APIKeyError as e:
             self.output_signal.emit(f"❌ API Key Error: {str(e)}")
-            self.finished_signal.emit(False)  # Signal upload failed
+            self.finished_signal.emit(False)
         except UploadError as e:
             self.output_signal.emit(f"❌ Upload Error: {str(e)}")
-            self.finished_signal.emit(False)  # Signal upload failed
+            self.finished_signal.emit(False)
         except Exception as e:
             self.output_signal.emit(f"❌ An unexpected error occurred: {str(e)}")
-            self.finished_signal.emit(False)  # Signal upload failed
+            self.finished_signal.emit(False)
