@@ -13,6 +13,7 @@ from config_manager import get_api_token
 
 logger = logging.getLogger(__name__)
 
+
 class DownloadWorkerThread(QThread):
     progress = pyqtSignal(str, int)
     status_update = pyqtSignal(str, str)
@@ -143,9 +144,10 @@ class DownloadWorkerThread(QThread):
             bytes_downloaded_for_file = 0
             try:
                 headers = {}
-                if token:
+                token = get_api_token()  # Get the token
+                if token:  # <--- KEY CHANGE: Only add if a token is present
                     headers["Authorization"] = f"Bearer {token}"
-                
+
                 with requests.get(download_url, stream=True, headers=headers, timeout=30) as r:
                     r.raise_for_status()
                     actual_file_size = int(r.headers.get('content-length', file_size))
@@ -241,9 +243,3 @@ class DownloadWorkerThread(QThread):
             logger.error(f"Task {self.task.id}: {error_message}", exc_info=True)
             self.status_update.emit(self.task.id, error_message)
             self.finished.emit(self.task.id, False, error_message)
-
-
-    def cancel_download(self):
-        logger.info(f"Cancellation requested for download task: {self.task.id}")
-        self.is_cancelled = True
-        self.status_update.emit(self.task.id, "Cancellation request received. Download will stop at the next check.")
