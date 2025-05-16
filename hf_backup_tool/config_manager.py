@@ -27,6 +27,10 @@ DEFAULT_CONFIG = {
     "UploadQueue": {
         "max_concurrent_upload_jobs": "1",
         "auto_clear_completed_uploads": "True"
+    },
+    "Window": { # NEW Section
+        "width": "700",
+        "height": "550",
     }
 }
 
@@ -72,6 +76,18 @@ def save_config():
             f"Failed to save configuration to {config_path}: {e}"
         ) from e
 
+# Add these to config_manager.py
+def get_window_width():
+    return int(config.get("Window", "width", fallback="700"))
+
+def get_window_height():
+    return int(config.get("Window", "height", fallback="550"))
+def set_window_size(width: int, height: int):
+    if not config.has_section("Window"):
+        config.add_section("Window")
+    config.set("Window", "width", str(width))
+    config.set("Window", "height", str(height))
+    save_config()
 def get_api_token():
     clear_token_from_env = os.environ.get("HF_API_TOKEN")
     if clear_token_from_env:

@@ -1,10 +1,10 @@
 import logging
 from config_dialog import ConfigDialog
 from download_app import DownloadApp
-from hf_upload import HuggingFaceUploader # Corrected import
+from hf_upload import HuggingFaceUploader  # Corrected import
 from zip_app import ZipApp
 from theme_handler import apply_theme, get_available_themes
-from PyQt6.QtGui import QAction
+from PyQt6.QtGui import QAction, QIcon, QAction
 from PyQt6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -13,6 +13,7 @@ from PyQt6.QtWidgets import (
     QMessageBox,
     QTabWidget,
 )
+from config_manager import get_window_width, get_window_height, set_window_size # Import window functions
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +35,12 @@ class MainWindow(QMainWindow):
         self.tab_widget.addTab(self.zip_app, "Zip Folder")
         self.tab_widget.addTab(self.download_app, "Download")
         self.create_layout_and_widgets()
-        self.resize(700, 550)
+
+        # Load window size from config
+        width = get_window_width()  # Use get_window_width()
+        height = get_window_height() # Use get_window_height()
+        self.resize(width, height)  # Load window dimensions
+
         try:
             apply_theme(self.app, theme_name="dark_teal.xml")
         except Exception as e:
@@ -67,10 +73,23 @@ class MainWindow(QMainWindow):
         logger.debug("Setting tab widget as central widget")
         self.setCentralWidget(self.tab_widget)
 
+        self.resolution_menu = QMenu("Resolution", self)  # NEW
+        self.menu_bar.addMenu(self.resolution_menu)  # NEW
+        self.create_resolution_actions()  # NEW
+
+        self.central_widget = QWidget()  # Create a central widget
+        main_layout = QVBoxLayout(self.central_widget) # This line has to change
+        self.setCentralWidget(self.central_widget)  # And this one.
+        main_layout.setContentsMargins(10, 10, 10, 10)
+        # Set a minimum size for the main window,
+        main_layout.setSpacing(10)
+        # Add the resolution items.
+
     def show_config_dialog(self):
         if not self.config_dialog:
             self.config_dialog = ConfigDialog()
-        self.config_dialog.exec()
+        if self.config_dialog.exec():
+             self.resize(get_window_width(), get_window_height()) # resize the window if the values are changed.
 
     def change_theme(self, theme_name):
         try:
@@ -100,3 +119,25 @@ class MainWindow(QMainWindow):
 
     def __del__(self):
         logger.debug("MainWindow is being destroyed")
+
+    def create_resolution_actions(self):
+        self.resolution_actions = {}
+        resolutions = [  # Define your resolution options here
+            (640, 480),
+            (800, 600),
+            (1024, 768),
+            (1280, 720),
+            (1920, 1080),
+            # ... add other resolutions
+        ]
+
+        for width, height in resolutions:
+            action_text = f"{width} x {height}"
+            action = QAction(action_text, self)
+            action.triggered.connect(lambda checked=False, w=width, h=height: self.set_window_size(w, h)) # CONNECTS TO FUNCTION
+            self.resolution_menu.addAction(action)
+            self.resolution_actions[(width, height)] = action  # Store for later use
+    def set_window_size(self, width: int, height: int):
+        """Sets the window size."""
+        self.resize(width, height) # Sets the dimensions
+        set_window_size(width, height)

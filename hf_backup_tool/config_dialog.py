@@ -10,6 +10,7 @@ from PyQt6.QtWidgets import (
     QMessageBox,
 )
 from custom_exceptions import ConfigError
+# Import from config_manager.py
 from config_manager import (
     set_api_token,
     get_api_token,
@@ -25,6 +26,9 @@ from config_manager import (
     set_max_concurrent_upload_jobs,
     get_auto_clear_completed_uploads,
     set_auto_clear_completed_uploads,
+    get_window_width,   # NEW
+    get_window_height,  # NEW
+    set_window_size,    # NEW
 )
 
 logger = logging.getLogger(__name__)
@@ -61,6 +65,10 @@ class ConfigDialog(QDialog):
         self.max_concurrent_upload_label = QLabel("Max Concurrent Upload Jobs:")
         self.max_concurrent_upload_input = QLineEdit()
         self.auto_clear_upload_checkbox = QCheckBox("Auto-clear completed uploads")
+        self.width_label = QLabel("Window Width:")  # NEW
+        self.width_input = QLineEdit()                # NEW
+        self.height_label = QLabel("Window Height:") # NEW
+        self.height_input = QLineEdit()               # NEW
         self.save_button = QPushButton("Save")
         self.cancel_button = QPushButton("Cancel")
         layout = QVBoxLayout()
@@ -79,6 +87,10 @@ class ConfigDialog(QDialog):
         layout.addWidget(self.max_concurrent_upload_label)
         layout.addWidget(self.max_concurrent_upload_input)
         layout.addWidget(self.auto_clear_upload_checkbox)
+        layout.addWidget(self.width_label) # Add width label and input to layout
+        layout.addWidget(self.width_input)
+        layout.addWidget(self.height_label) # Add height label and input to layout
+        layout.addWidget(self.height_input)
         button_layout = QHBoxLayout()
         button_layout.addWidget(self.save_button)
         button_layout.addWidget(self.cancel_button)
@@ -86,6 +98,7 @@ class ConfigDialog(QDialog):
         self.setLayout(layout)
         self.save_button.clicked.connect(self.save_config)
         self.cancel_button.clicked.connect(self.close)
+
 
     def load_config_values(self):
         self.api_token_input.setText(get_api_token() or "")
@@ -100,6 +113,9 @@ class ConfigDialog(QDialog):
         self.auto_clear_checkbox.setChecked(get_auto_clear_completed_downloads())
         self.max_concurrent_upload_input.setText(str(get_max_concurrent_upload_jobs()))
         self.auto_clear_upload_checkbox.setChecked(get_auto_clear_completed_uploads())
+        self.width_input.setText(str(get_window_width())) # Load width
+        self.height_input.setText(str(get_window_height())) # Load height
+
 
     def save_config(self):
         api_token = self.api_token_input.text()
@@ -113,6 +129,10 @@ class ConfigDialog(QDialog):
             max_concurrent_upload_jobs = int(self.max_concurrent_upload_input.text())
             if max_concurrent_upload_jobs <= 0:
                 raise ValueError("Max concurrent upload jobs must be a positive integer.")
+            width = int(self.width_input.text()) # NEW: Get width
+            height = int(self.height_input.text()) # NEW: Get height
+            if width <= 0 or height <= 0:
+                raise ValueError("Window width and height must be positive integers.")
         except ValueError as e:
             QMessageBox.critical(self, "Error", str(e))
             return
@@ -129,6 +149,7 @@ class ConfigDialog(QDialog):
             set_auto_clear_completed_downloads(self.auto_clear_checkbox.isChecked())
             set_max_concurrent_upload_jobs(max_concurrent_upload_jobs)
             set_auto_clear_completed_uploads(self.auto_clear_upload_checkbox.isChecked())
+            set_window_size(width, height) # Save size
             QMessageBox.information(
                 self, "Success", "Configuration saved successfully."
             )

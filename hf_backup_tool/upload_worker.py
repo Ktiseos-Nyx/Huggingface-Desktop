@@ -1,12 +1,17 @@
+import os
+import time
+import logging
 from PyQt6.QtCore import QThread, pyqtSignal
 from huggingface_hub import HfApi, create_repo, upload_file, upload_folder
-import os
 from custom_exceptions import UploadError, APIKeyError
 
+logger = logging.getLogger(__name__)
+
 class UploadWorker(QThread):
-    progress_signal = pyqtSignal(int)
-    output_signal = pyqtSignal(str)
-    finished_signal = pyqtSignal(bool)
+    signal_status = pyqtSignal(str, str)
+    signal_progress = pyqtSignal(str, int)  # Add the signal for progress
+    signal_output = pyqtSignal(str, str)
+    signal_finished = pyqtSignal(bool, str)  # Signal now takes string for a final message
 
     def __init__(
         self,
@@ -21,6 +26,7 @@ class UploadWorker(QThread):
         upload_type="File",
         create_repo=False,
         repo_exists=False,
+        use_lfs=False,
     ):
         super().__init__()
         self.api_token = api_token
@@ -34,22 +40,22 @@ class UploadWorker(QThread):
         self.upload_type = upload_type
         self.create_repo = create_repo
         self.repo_exists = repo_exists
+        self.use_lfs = use_lfs # NEW LFS
 
     def run(self):
         try:
             if not self.api_token:
                 raise APIKeyError("API token not found in configuration.")
-            api = HfApi(token=self.api_token)
+            api = HfApi()
             repo_id = f"{self.repo_owner}/{self.repo_name}"
             if self.repo_exists:
                 try:
                     api.repo_info(repo_id, repo_type=self.repo_type)
-                    self.output_signal.emit(f"✅ Repository '{repo_id}' found.")
+                    self.signal_output.emit(self.task_id, f"✅ Repository '{repo_id}' found.")
                 except Exception as e:
-                    self.output_signal.emit(
-                        f"❌ Repository '{repo_id}' not found. Error: {str(e)}"
-                    )
-                    self.finished_signal.emit(False)
+                    msg = f"❌ Repository '{repo_id}' not found. Error: {str(e)}"
+                    self.signal_output.emit(self.task_id, msg)
+                    self.signal_finished.emit(False, msg)
                     return
             if self.create_repo:
                 try:
@@ -59,44 +65,64 @@ class UploadWorker(QThread):
                         token=self.api_token,
                         private=False,
                     )
-                    self.output_signal.emit(
-                        f"✅ Repository '{repo_id}' created successfully."
-                    )
+                    self.signal_output.emit(self.task_id, f"✅ Repository '{repo_id}' created successfully.")
                 except Exception as e:
-                    self.output_signal.emit(
-                        f"❌ Failed to create repository '{repo_id}'. Error: {str(e)}"
-                    )
-                    self.finished_signal.emit(False)
+                    msg = f"❌ Failed to create repository '{repo_id}'. Error: {str(e)}"
+                    self.signal_output.emit(self.task_id, msg)
+                    self.signal_finished.emit(False, msg)
                     return
             if self.upload_type == "File":
                 if not self.file_path:
                     raise UploadError("No file selected for upload.")
                 try:
-                    filename = os.path.basename(self.file_path)
+                    file_name = os.path.basename(self.file_path)
                     if self.repo_folder:
-                        upload_path = os.path.join(self.repo_folder, filename)
+                        path_in_repo = f"{self.repo_folder}/{file_name}"
                     else:
-                        upload_path = filename
-                    upload_file(
-                        path_or_fileobj=self.file_path,
-                        path_in_repo=upload_path,
-                        repo_id=repo_id,
-                        repo_type=self.repo_type,
-                        commit_message=self.commit_message,
-                        token=self.api_token,
-                        create_pr=False,
-                    )
-                    self.output_signal.emit(
-                        f"✅ File '{filename}' uploaded to '{repo_id}' successfully."
-                    )
+                        path_in_repo = file_name
+
+                    self.signal_output.emit(self.task_id, f"⏳ Uploading {file_name}...")  # START MESSAGE
+                    # Get file size to use for progress bar.
+                    file_size = os.path.getsize(self.file_path)
+                    bytes_uploaded = 0
+
+                    def progress_callback(progress):
+                         self.signal_progress.emit(self.task_id, progress)
+                    # Use the new upload function
+                    if self.use_lfs:
+                         # In the future, you'd use a different API method, but the `upload_file` call below works
+                         # with Git LFS if the file is correctly tracked.  The important thing is that
+                         # the user has Git LFS configured.
+                         api.upload_file(
+                             path_or_fileobj=self.file_path,
+                             path_in_repo=path_in_repo,
+                             repo_id=repo_id,
+                             repo_type=self.repo_type,
+                             token=self.api_token,
+                             commit_message=self.commit_msg,
+                             create_pr=self.create_pr,
+                         )
+                    else:
+                         api.upload_file(
+                             path_or_fileobj=self.file_path,
+                             path_in_repo=path_in_repo,
+                             repo_id=repo_id,
+                             repo_type=self.repo_type,
+                             token=self.api_token,
+                             commit_message=self.commit_msg,
+                             create_pr=self.create_pr,
+                         )
+                    self.signal_output.emit(self.task_id, f"✅ File '{file_name}' uploaded to '{repo_id}' successfully.")
                 except Exception as e:
-                    self.output_signal.emit(f"❌ File upload failed. Error: {str(e)}")
-                    self.finished_signal.emit(False)
+                    msg = f"❌ File upload failed. Error: {str(e)}"
+                    self.signal_output.emit(self.task_id, msg)
+                    self.signal_finished.emit(False, msg)
                     return
             elif self.upload_type == "Folder":
                 if not self.folder_path:
                     raise UploadError("No folder selected for upload.")
                 try:
+                    self.signal_output.emit(self.task_id, f"⏳ Uploading {self.folder_path}...")  # START MESSAGE
                     upload_folder(
                         folder_path=self.folder_path,
                         repo_id=repo_id,
@@ -104,20 +130,23 @@ class UploadWorker(QThread):
                         commit_message=self.commit_message,
                         token=self.api_token,
                     )
-                    self.output_signal.emit(
-                        f"✅ Folder '{self.folder_path}' uploaded to '{repo_id}' successfully."
-                    )
+                    self.signal_output.emit(self.task_id, f"✅ Folder '{self.folder_path}' uploaded to '{repo_id}' successfully.")
                 except Exception as e:
-                    self.output_signal.emit(f"❌ Folder upload failed. Error: {str(e)}")
-                    self.finished_signal.emit(False)
+                    msg = f"❌ Folder upload failed. Error: {str(e)}"
+                    self.signal_output.emit(self.task_id, msg)
+                    self.signal_finished.emit(False, msg)
                     return
-            self.finished_signal.emit(True)
+
+            self.signal_finished.emit(True, "Upload completed successfully.")
         except APIKeyError as e:
-            self.output_signal.emit(f"❌ API Key Error: {str(e)}")
-            self.finished_signal.emit(False)
+            msg = f"❌ API Key Error: {str(e)}"
+            self.signal_output.emit(self.task_id, msg)
+            self.signal_finished.emit(False, msg)
         except UploadError as e:
-            self.output_signal.emit(f"❌ Upload Error: {str(e)}")
-            self.finished_signal.emit(False)
+            msg = f"❌ Upload Error: {str(e)}"
+            self.signal_output.emit(self.task_id, msg)
+            self.signal_finished.emit(False, msg)
         except Exception as e:
-            self.output_signal.emit(f"❌ An unexpected error occurred: {str(e)}")
-            self.finished_signal.emit(False)
+            msg = f"❌ An unexpected error occurred: {e}"
+            self.signal_output.emit(self.task_id, msg)
+            self.signal_finished.emit(False, msg)

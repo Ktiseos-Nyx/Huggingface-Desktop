@@ -3,3 +3,4 @@ qt_material
 huggingface_hub
 requests
 keyring
+gitpython
