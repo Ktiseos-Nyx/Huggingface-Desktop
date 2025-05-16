@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> ff4a0cf6934e70a4138adfa8d2a51ce2c5d1c8fa
 # Hugging Face Backup Tool
 
 A user-friendly desktop application for backing up your Hugging Face models, datasets, and spaces.
@@ -109,13 +112,7 @@ Here are the general steps for installing the tool.
         source venv/bin/activate.fish
         ```
 
-5.  **Install Dependencies:**  Install the required Python packages using `pip`:
-
-    ```bash
-    pip install -r requirements.txt
-    ```
- 
-6.  **Run the Application:**
+5.  **Run the Application:**
 
     ```bash
     python launch.py
