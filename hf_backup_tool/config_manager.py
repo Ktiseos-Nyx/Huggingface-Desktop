@@ -100,7 +100,7 @@ def get_api_token():
         return deobfuscate_token(obfuscated_token_from_config)
     
     logger.debug("No API token found in environment or config.")
-    return ""
+    return None # <---- CHANGE THIS LINE to None
 
 def set_api_token(token):
     if not config.has_section("HuggingFace"):

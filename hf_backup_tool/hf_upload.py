@@ -33,7 +33,10 @@ logger = logging.getLogger(__name__)
 
 # Import the helper functions from git_lfs_utils.py
 from git_lfs_utils import init_git_lfs, track_files, add_gitattributes
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 class HuggingFaceUploader(QWidget):
     def __init__(self):
         super().__init__()
@@ -60,6 +63,7 @@ class HuggingFaceUploader(QWidget):
         self._cancel_requested = False
 
         self.init_ui()
+        self.setMinimumSize(600, 500)  # Set a reasonable minimum size
 
     def init_ui(self):
         main_layout = QVBoxLayout(self) # Pass self to the layout
@@ -189,8 +193,12 @@ class HuggingFaceUploader(QWidget):
         options_layout.addWidget(self.check_repo_exists_checkbox)
         options_layout.addWidget(self.create_repo_checkbox)
         options_layout.addWidget(self.clear_after_checkbox)
+<<<<<<< Updated upstream
         options_layout.addWidget(self.use_lfs_checkbox) # Add the check box here
 
+=======
+        options_layout.addWidget(self.use_lfs_checkbox)
+>>>>>>> Stashed changes
         main_layout.addLayout(options_layout)
 
         header_files_list = QLabel("Files to Upload (Select files from the list)")
@@ -220,9 +228,38 @@ class HuggingFaceUploader(QWidget):
         output_layout.addWidget(self.progress_bar)
         output_layout.addLayout(progress_status_layout)
         main_layout.addLayout(output_layout)
+<<<<<<< Updated upstream
         # Set Stretch Factors for Vertical Space
         # main_layout.setStretchFactor(self.file_list, 2)
         main_layout.setStretchFactor(self.output_text, 1)
+=======
+
+        button_layout = QHBoxLayout()
+        self.update_files_button = QPushButton("Refresh File List")
+        self.upload_button = QPushButton("Upload Selected Files")
+        self.cancel_button = QPushButton("Cancel Upload")
+        self.cancel_button.setEnabled(False)
+        self.clear_output_button = QPushButton("Clear Output Log")
+        button_layout.addWidget(self.update_files_button)
+        button_layout.addWidget(self.upload_button)
+        button_layout.addWidget(self.cancel_button)
+        button_layout.addWidget(self.clear_output_button)
+        main_layout.addLayout(button_layout)
+
+        scroll_content_widget = QWidget()
+        scroll_content_widget.setLayout(main_layout)
+
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setWidget(scroll_content_widget)
+        scroll_area.setWidgetResizable(True) # added for resizing, although not required as much
+        scroll_content_widget.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Preferred) # Makes the area and contained elements grow.
+
+        page_layout = QVBoxLayout(self)
+        page_layout.setContentsMargins(0, 0, 0, 0)
+        page_layout.addWidget(scroll_area)
+        self.setLayout(page_layout)
+>>>>>>> Stashed changes
 
         self.edit_config_button.clicked.connect(self.edit_config)
         self.select_dir_button.clicked.connect(self.select_directory)
@@ -287,7 +324,6 @@ class HuggingFaceUploader(QWidget):
         self.file_list.clear()
         file_extension_data = self.file_type_dropdown.currentData()
         search_pattern = f"*.{file_extension_data}" if file_extension_data != "*" else "*"
-
         if not os.path.isdir(self.current_directory):
             self.output_text.append(f"❌ Current directory is invalid: {self.current_directory}")
             return
@@ -397,6 +433,12 @@ class HuggingFaceUploader(QWidget):
         self.progress_bar.setValue(0)
         self.progress_percent_label.setText("0%")
         self.progress_label.setText("Status: Starting uploads...")
+<<<<<<< Updated upstream
+=======
+        self.output_text.append(f"🚀 Starting parallel upload of {self.total_files_to_upload} files to {self.repo_id_for_upload} (max {self.max_concurrent_jobs} jobs)...")
+
+        self._launch_next_workers()
+>>>>>>> Stashed changes
 
         use_lfs = self.use_lfs_checkbox.isChecked() # Get the LFS status
         self._launch_next_workers(use_lfs=use_lfs) # PASS THE LFS
@@ -418,8 +460,12 @@ class HuggingFaceUploader(QWidget):
                 repo_folder=self.repo_folder_for_upload,
                 upload_type="File",
                 create_repo=False,
+<<<<<<< Updated upstream
                 repo_exists=True,
                 use_lfs=use_lfs,   # PASS IT HERE.
+=======
+                repo_exists=True
+>>>>>>> Stashed changes
             )
             worker.output_signal.connect(self._handle_worker_output)
             worker.finished_signal.connect(lambda success, worker_instance=worker, fp=file_to_upload: self._handle_worker_finished(worker_instance, fp, success))
@@ -492,7 +538,11 @@ class HuggingFaceUploader(QWidget):
         logger.info(f"Upload task to {self.repo_id_for_upload} finished. Succeeded: {self.files_succeeded_count}/{self.total_files_to_upload}. Cancelled: {self._cancel_requested}")
 
         if self.clear_after_checkbox.isChecked() and self.files_succeeded_count == self.total_files_to_upload and not self._cancel_requested:
+<<<<<<< Updated upstream
              QTimer.singleShot(2000, self.clear_output)
+=======
+            QTimer.singleShot(2000, self.clear_output)
+>>>>>>> Stashed changes
 
     def cancel_upload(self):
         if not self._is_upload_active:
@@ -515,12 +565,78 @@ class HuggingFaceUploader(QWidget):
         # If no workers were active or they terminated quickly, finalize.
         # Otherwise, _handle_worker_finished will eventually call _finalize_upload_process.
         if not self.active_workers:
+<<<<<<< Updated upstream
              QTimer.singleShot(100, self._finalize_upload_process) # Use a short delay to allow UI to update
 
         self.cancel_button.setEnabled(False) # Disable cancel button once pressed
+=======
+            QTimer.singleShot(100, self._finalize_upload_process)  # Use a short delay to allow UI to update
+
+        self.cancel_button.setEnabled(False)  # Disable cancel button once pressed
+>>>>>>> Stashed changes
 
     def clear_output(self):
         self.output_text.clear()
         self.progress_bar.setValue(0)
         self.progress_label.setText("Status: Ready")
+<<<<<<< Updated upstream
         self.progress_percent_label.setText("0%")
+=======
+        self.progress_percent_label.setText("0%")
+
+    def repo_exists_on_hub(self, repo_id, repo_type):
+        api_token = get_api_token()  # This now returns a clear token
+        if not api_token:
+            self.output_text.append("❌ API token not configured. Cannot check repository status.")
+            QMessageBox.warning(self, "API Token Missing", "API token is not configured. Please set it in the configuration.")
+            return False
+
+        try:
+            from huggingface_hub import HfApi
+            hf_api = HfApi(token=api_token)
+            hf_api.repo_info(repo_id=repo_id, repo_type=repo_type)
+            self.output_text.append(f"✅ Repository {repo_id} exists.")
+            return True
+        except Exception as e:
+            if "404" in str(e) or "not found" in str(e).lower():
+                self.output_text.append(f"ℹ️ Repository {repo_id} does not exist or is private.")
+                return False
+            else:
+                self.output_text.append(f"⚠️ Error checking repository {repo_id}: {str(e)}")
+                logger.error(f"Error checking repo {repo_id}: {e}", exc_info=True)
+                return False
+
+    def create_repo_on_hub(self, repo_id, repo_type):
+        api_token = get_api_token()
+        if not api_token:
+            self.output_text.append("❌ API token not configured. Cannot create repository.")
+            QMessageBox.warning(self, "API Token Missing", "API token is not configured. Please set it in the configuration.")
+            return False
+
+        try:
+            from huggingface_hub import create_repo
+
+            create_repo(repo_id, token=api_token, repo_type=repo_type, exist_ok=True)
+            self.output_text.append(f"✅ Successfully created or confirmed repository: {repo_id}")
+            return True
+        except Exception as e:
+            self.output_text.append(f"❌ Failed to create repository {repo_id}: {str(e)}")
+            logger.error(f"Error creating repo {repo_id}: {e}", exc_info=True)
+            return False
+
+    def closeEvent(self, event):
+        if self._is_upload_active:
+            reply = QMessageBox.question(self, 'Confirm Exit',
+                                         "An upload is in progress. Are you sure you want to exit? This will attempt to cancel the ongoing uploads.",
+                                         QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                                         QMessageBox.StandardButton.No)
+            if reply == QMessageBox.StandardButton.Yes:
+                self.cancel_upload()
+                QTimer.singleShot(500, event.accept)
+            else:
+                event.ignore()
+        else:
+            if self.config_dialog:
+                self.config_dialog.close()
+            event.accept()
+>>>>>>> Stashed changes
