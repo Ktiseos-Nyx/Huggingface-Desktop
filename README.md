@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-
-=======
->>>>>>> ff4a0cf6934e70a4138adfa8d2a51ce2c5d1c8fa
 # Hugging Face Backup Tool
 
 A user-friendly desktop application for backing up your Hugging Face models, datasets, and spaces.
