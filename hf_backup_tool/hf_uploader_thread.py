@@ -2,9 +2,9 @@ import os
 import time
 import logging
 from PyQt6.QtCore import QThread, pyqtSignal
-from huggingface_hub import upload_file
+from huggingface_hub import HfApi  # Use HfApi
 from huggingface_hub.utils import HfHubHTTPError
-from config_manager import get_api_token
+from config_manager import get_api_token  # Make sure this is imported correctly
 
 logger = logging.getLogger(__name__)
 
@@ -26,18 +26,20 @@ class HFUploaderThread(QThread):
         self.create_pr = create_pr
         self.rate_limit_delay = rate_limit_delay
         self._is_running = True
+        self.api = HfApi() # Initialise HfApi
 
     def run(self):
         overall_success = True
         final_message = "Upload process completed."
+        api_token = get_api_token()
+        if not api_token:
+            msg = "❌ Hugging Face API token not found. Please configure it."
+            self.signal_output.emit(self.task_id, msg)
+            self.signal_finished.emit(self.task_id, False, msg)
+            return
+
         try:
-            api_token = get_api_token()
-            if not api_token:
-                msg = "❌ Hugging Face API token not found. Please configure it."
-                self.signal_output.emit(self.task_id, msg)
-                self.signal_finished.emit(self.task_id, False, msg)
-                return
-            
+            self.signal_output.emit(self.task_id, "Starting upload...")
             total_files = len(self.selected_files)
             if total_files == 0:
                 msg = "ℹ️ No files selected for upload in this task."
@@ -58,7 +60,7 @@ class HFUploaderThread(QThread):
                 self.signal_status.emit(self.task_id, f"Uploading {file_name}...")
                 self.signal_output.emit(self.task_id, f"⏳ Starting upload of {file_name} to {self.repo_id}/{path_in_repo}")
                 try:
-                    upload_file(
+                    self.api.upload_file(  # Use self.api
                         path_or_fileobj=file_path,
                         path_in_repo=path_in_repo,
                         repo_id=self.repo_id,

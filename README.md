@@ -1,24 +1,25 @@
-[![Made with Python](https://img.shields.io/badge/Python->=3.10-blue?logo=python&logoColor=white)](https://python.org "Go to Python homepage") 
+
 # Hugging Face Backup Tool
 
 A user-friendly desktop application for backing up your Hugging Face models, datasets, and spaces.
+[![Made with Python](https://img.shields.io/badge/Python->=3.10-blue?logo=python&logoColor=white)](https://python.org "Go to Python homepage") [![CodeQL](https://github.com/Ktiseos-Nyx/Huggingface-Desktop/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/Ktiseos-Nyx/Huggingface-Desktop/actions/workflows/github-code-scanning/codeql) ![Discord](https://img.shields.io/discord/1330470680348594276?style=social&logo=discord&logoColor=%235865F2) ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 
 [Connect with us on Discord](https://discord.gg/MASBKnNFWh)
 
 ## Table of Contents
 
-1.  [Overview](#overview)
-2.  [Features](#features)
-3.  [Installation](#installation)
-    *   [3.1. System Requirements (Theoretical)](#31-system-requirements-theoretical)
-    *   [3.2. Installation Steps](#32-installation-steps)
-4.  [Configuration](#configuration)
-5.  [Issues & Known Limitations](#issues--known-limitations)
-6.  [Usage](#usage)
-7.  [Contributing](#contributing)
-8.  [License](#license)
-9.  [![view - Documentation](https://img.shields.io/badge/view-Documentation-blue?style=for-the-badge)](/docs/ "Go to project documentation")
-10.  [![contributions - welcome](https://img.shields.io/badge/contributions-welcome-blue)](/CONTRIBUTING.md "Go to contributions doc") 
+- [Hugging Face Backup Tool](#hugging-face-backup-tool)
+  - [Table of Contents](#table-of-contents)
+  - [1. Overview](#1-overview)
+  - [2. Features](#2-features)
+  - [3. Installation](#3-installation)
+    - [3.1. System Requirements](#31-system-requirements)
+    - [3.2. Installation Steps](#32-installation-steps)
+  - [4. Configuration](#4-configuration)
+  - [5. Issues \& Known Limitations](#5-issues--known-limitations)
+  - [6. Usage](#6-usage)
+  - [7. Contributing](#7-contributing)
+  - [8. License](#8-license)
 
 ## 1. Overview
 
@@ -53,7 +54,7 @@ Here's a quick overview of what you can do with the Hugging Face Backup Tool:
 
 This section guides you through installing and setting up the tool. It requires **Python 3.10 or higher**.
 
-### 3.1. System Requirements (Theoretical)
+### 3.1. System Requirements
 
 The Hugging Face Backup Tool is built using PyQt6, a cross-platform GUI framework. This means it *should* be compatible with the following operating systems:
 
@@ -78,11 +79,9 @@ Here are the general steps for installing the tool.
 2.  **Clone the Repository:**  Open a terminal or command prompt and clone the repository:
 
     ```bash
-    git clone [YOUR_REPOSITORY_URL]
-    cd [YOUR_REPOSITORY_DIRECTORY]
+    git clone https://github.com/Ktiseos-Nyx/Huggingface-Desktop/
+    cd Huggingface-Desktop
     ```
-
-    > Replace `[YOUR_REPOSITORY_URL]` with the URL of your GitHub repository and `[YOUR_REPOSITORY_DIRECTORY]` with the desired directory name.
 
 3.  **Create a Virtual Environment (Recommended):**  It's best practice to use a virtual environment.  This isolates the project's dependencies.
 

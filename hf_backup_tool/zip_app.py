@@ -76,12 +76,16 @@ class ZipApp(QWidget):
                 self, "Save Zip File", zip_file_path, "Zip files (*.zip)"
             )
             if save_path:
-                shutil.copy2(temp_zip_path, save_path)
-                self.output_text.append(
-                    f"Successfully created and saved {zip_file_path} to {save_path}"
-                )
+                try:
+                    shutil.copy2(temp_zip_path, save_path)
+                    self.output_text.append(
+                        f"Successfully created and saved {zip_file_path} to {save_path}"
+                    )
+                except (IOError, OSError) as e: # More specific error handling
+                    self.output_text.append(f"Error saving zip file: {e}")
+                    logger.error(f"Error copying zip file: {e}", exc_info=True)
             else:
-                self.output_text.append("Zip file creation cancelled.")
+                self.output_text.append("Zip file saving cancelled by user.") # More informative.
         except Exception as e:
             logger.error(f"Zip error: {e}", exc_info=True)
             self.output_text.append(f"Error creating zip file: {e}")

@@ -1,25 +1,22 @@
+# Example usage
 import logging
-import requests
-from requests.adapters import HTTPAdapter
-from urllib3.util.retry import Retry
-from config_manager import config
+from api_session import APISession #  IMPORT the class
 
 logger = logging.getLogger(__name__)
 
-def create_session():
-    session = requests.Session()
-    retry = Retry(
-        total=5,
-        backoff_factor=0.5,
-        status_forcelist=[500, 502, 503, 504],
-    )
-    adapter = HTTPAdapter(max_retries=retry)
-    session.mount("http://", adapter)
-    session.mount("https://", adapter)
-    if config.getboolean("Proxy", "use_proxy"):
-        proxies = {"http": config["Proxy"]["http"], "https": config["Proxy"]["https"]}
-        session.proxies.update(proxies)
-        logger.info(f"Using proxy: {proxies}")
-    else:
-        logger.info("Not using a proxy.")
-    return session
+try:
+    with APISession() as session:
+        response = session.get("https://api.example.com/some_api_endpoint", timeout=10)
+        response.raise_for_status()  # Raise HTTPError for bad responses (4xx or 5xx)
+        data = response.json()
+        # Process the data
+        print(data)
+
+except requests.exceptions.RequestException as e:
+    logger.error(f"Request failed: {e}")
+    # Handle network errors, timeouts, etc.
+except ValueError as e:
+    logger.error(f"Error parsing JSON: {e}")
+    # Handle JSON decoding errors
+except Exception as e:
+    logger.error(f"An unexpected error occurred: {e}")
