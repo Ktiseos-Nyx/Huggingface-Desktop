@@ -1,7 +1,7 @@
 import logging
 from config_dialog import ConfigDialog
 from download_app import DownloadApp
-from hf_upload import HuggingFaceUploader # Corrected import
+from hf_upload import HuggingFaceUploader  # Corrected import
 from zip_app import ZipApp
 from theme_handler import apply_theme, get_available_themes
 from PyQt6.QtGui import QAction
@@ -12,9 +12,13 @@ from PyQt6.QtWidgets import (
     QMenuBar,
     QMessageBox,
     QTabWidget,
+    QSizePolicy,
 )
 
 logger = logging.getLogger(__name__)
+
+#
+
 
 class MainWindow(QMainWindow):
     def __init__(self, app: QApplication):
@@ -33,13 +37,26 @@ class MainWindow(QMainWindow):
         self.tab_widget.addTab(self.hf_uploader, "Hugging Face Uploader")
         self.tab_widget.addTab(self.zip_app, "Zip Folder")
         self.tab_widget.addTab(self.download_app, "Download")
+        self.tab_widget.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Expanding
+        )
         self.create_layout_and_widgets()
-        self.resize(700, 550)
+        
+        # Set a reasonable default size based on screen size
+        screen_size = self.app.primaryScreen().size()
+        window_width = min(int(screen_size.width() * 0.7), 1000)
+        window_height = min(int(screen_size.height() * 0.8), 800)
+        self.resize(window_width, window_height)
         try:
             apply_theme(self.app, theme_name="dark_teal.xml")
         except Exception as e:
             logger.error(f"Error applying initial theme: {e}")
-            QMessageBox.critical(self, "Error", f"Failed to apply default theme: {e}")
+            QMessageBox.critical(
+                self,
+                "Error",
+                f"Failed to apply default theme: {e}"
+            )
         logger.info("MainWindow initialized")
 
     def create_layout_and_widgets(self):
@@ -60,7 +77,9 @@ class MainWindow(QMainWindow):
             logger.debug(f"Creating action for theme: {theme}")
             action = QAction(theme, self)
             action.triggered.connect(
-                lambda checked=False, theme_name=theme: self.change_theme(theme_name)
+                lambda checked=False, theme_name=theme: self.change_theme(
+                    theme_name
+                )
             )
             self.theme_menu.addAction(action)
             self.theme_actions[theme] = action
