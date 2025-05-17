@@ -10,7 +10,7 @@ A user-friendly desktop application for backing up your Hugging Face models, dat
 1.  [Overview](#overview)
 2.  [Features](#features)
 3.  [Installation](#installation)
-    *   [3.1. System Requirements (Theoretical)](#31-system-requirements-theoretical)
+    *   [3.1. System Requirements](#31-system-requirements)
     *   [3.2. Installation Steps](#32-installation-steps)
 4.  [Configuration](#configuration)
 5.  [Issues & Known Limitations](#issues--known-limitations)
@@ -53,7 +53,7 @@ Here's a quick overview of what you can do with the Hugging Face Backup Tool:
 
 This section guides you through installing and setting up the tool. It requires **Python 3.10 or higher**.
 
-### 3.1. System Requirements (Theoretical)
+### 3.1. System Requirements
 
 The Hugging Face Backup Tool is built using PyQt6, a cross-platform GUI framework. This means it *should* be compatible with the following operating systems:
 
@@ -78,11 +78,11 @@ Here are the general steps for installing the tool.
 2.  **Clone the Repository:**  Open a terminal or command prompt and clone the repository:
 
     ```bash
-    git clone [YOUR_REPOSITORY_URL]
-    cd [YOUR_REPOSITORY_DIRECTORY]
+    git clone https://github.com/Ktiseos-Nyx/Huggingface-Desktop
+    cd /Huggingface-Desktop
     ```
 
-    > Replace `[YOUR_REPOSITORY_URL]` with the URL of your GitHub repository and `[YOUR_REPOSITORY_DIRECTORY]` with the desired directory name.
+
 
 3.  **Create a Virtual Environment (Recommended):**  It's best practice to use a virtual environment.  This isolates the project's dependencies.
 
