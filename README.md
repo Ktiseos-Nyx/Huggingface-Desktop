@@ -73,7 +73,7 @@ Here are the general steps for installing the tool.
 
     *   **Windows:**  During installation, make sure to check the box "Add Python to PATH".
     *   **Linux:**  Use your distribution's package manager (e.g., `sudo apt install python3` on Debian/Ubuntu, `sudo dnf install python3` on Fedora/CentOS/RHEL).
-    *   **macOS:** You may install with Homebrew (`brew install python@3.10`) but you may also install from the website.
+    *   **macOS:** You may install with [Homebrew](https://brew.sh/) (`brew install python@3.10`) but you may also install from the website. 
 
 2.  **Clone the Repository:**  Open a terminal or command prompt and clone the repository:
 
