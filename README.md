@@ -73,21 +73,27 @@ Here are the general steps for installing the tool.
 
     *   **Windows:**  During installation, make sure to check the box "Add Python to PATH".
     *   **Linux:**  Use your distribution's package manager (e.g., `sudo apt install python3` on Debian/Ubuntu, `sudo dnf install python3` on Fedora/CentOS/RHEL).
-    *   **macOS:** You may install with [Homebrew](https://brew.sh/) (`brew install python@3.10`) but you may also install from the website. 
+    *   **macOS:** You may install with [Homebrew](https://brew.sh/) (`brew install python@3.10`) but you may also install from the website.
+  
+   > If you're interested in using a friendlier shell for your terminal please check out [FISH](https://fishshell.com/). 
 
 2.  **Clone the Repository:**  Open a terminal or command prompt and clone the repository:
 
     ```bash
-    git clone https://github.com/Ktiseos-Nyx/Huggingface-Desktop
-    cd /Huggingface-Desktop
+    git clone  https://github.com/Ktiseos-Nyx/Huggingface-Desktop
+    cd Huggingface-Desktop
     ```
 
-
+    > To Install the specific branch of Refactoring please use
+    >  ```bash
+    >    git clone -b refactoring --single-branch https://github.com/Ktiseos-Nyx/Huggingface-Desktop.git
+    >    cd Huggingface-Desktop
+    >    ```
 
 3.  **Create a Virtual Environment (Recommended):**  It's best practice to use a virtual environment.  This isolates the project's dependencies.
 
     ```bash
-    python -m venv .venv
+    python -m venv venv
     ```
 
 4.  **Activate the Virtual Environment:**
@@ -95,19 +101,19 @@ Here are the general steps for installing the tool.
     *   **Windows:**
 
         ```cmd
-        .venv\Scripts\activate
+        venv\Scripts\activate
         ```
 
     *   **Linux/macOS (Bash/Zsh):**
 
         ```bash
-        source .venv/bin/activate
+        source venv/bin/activate
         ```
 
     *   **FISH:**
 
         ```fish
-        source .venv/bin/activate.fish
+        source venv/bin/activate.fish
         ```
 
 5.  **Install Dependencies:**  Install the required Python packages using `pip`:
@@ -115,18 +121,11 @@ Here are the general steps for installing the tool.
     ```bash
     pip install -r requirements.txt
     ```
-
-    > If you don't have a `requirements.txt` file, install the packages individually:
-
-    ```bash
-    pip install PyQt6 qt_material huggingface_hub requests
-    pip install Pyside6
-    ```
-
+ 
 6.  **Run the Application:**
 
     ```bash
-    python hf_backup_tool/main.py
+    python launch.py
     ```
 
 ## 4. Configuration
@@ -144,18 +143,14 @@ Before using the tool, you need to configure it with your Hugging Face API token
 
 > This section lists some of the known limitations and areas for improvement.
 
-*   **Single File Upload (Currently):** The tool currently only supports uploading *one* file at a time.
-*   **Output Logging:**  Output and progress updates may currently be visible only in the terminal logs.
-*   **Repository Creation (Potential Issues):**  Creating a new repository might still have issues.  It's generally recommended to pre-create your repositories on the Hugging Face Hub.
 *   **Spacing and UI Glitches:**  There might still be some spacing or UI layout issues.
-*   **Multiple File Upload:** The GUI doesn't support multiple file uploads yet.
-*   **macOS Development Challenges:** Developing on macOS can be tricky (as you noted!).
+*   **General Code Challenges:** Developing on macOS can be tricky, and there are still some things we're going to work on in future.
 
 ## 6. Usage
 
 Here's how to use the Hugging Face Backup Tool:
 
-**Steps:**
+**Steps for the Uploader:**
 
 1.  **Select a Directory:**  Click the "Select Directory" button, and choose the directory containing the files you want to back up.
 2.  **Choose a File Type:**  Use the "File Type" dropdown to select the type of files you want to upload (e.g., SafeTensors, PyTorch Models).
@@ -163,6 +158,11 @@ Here's how to use the Hugging Face Backup Tool:
 4.  **Enter Repository Information:**  Fill in the "Owner" (your organization or username) and "Repository" name.
 5.  **Click "Upload":** Start the upload process.
 6.  **Check Output:** Check the output window in the GUI for progress updates.
+
+**Steps for the Zip Folder:**
+
+
+**Steps for the Downloader:**
 
 ## 7. Contributing
 
@@ -176,3 +176,10 @@ Contributions are very welcome! If you'd like to contribute, please:
 This project is licensed under the GNU General Public License v3.0.  See the [LICENSE](https://github.com/Ktiseos-Nyx/Huggingface-Desktop#GPL-3.0-1-ov-file) file for details.
 
 > **GNU General Public License v3.0:** ([https://www.gnu.org/licenses/gpl-3.0.en.html](https://www.gnu.org/licenses/gpl-3.0.en.html)).
+
+## 9. Future Plans
+
+1. Looking to refactor again later on and add "support" for easy tabbable plugins, like a metadata reader.
+2. Porting this to gradio for an easier online use.
+3. Refactoring the original Jupyter to have similar features. 
+
