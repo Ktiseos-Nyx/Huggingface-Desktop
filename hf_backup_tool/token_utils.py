@@ -1,9 +1,13 @@
-# token_utils.py
+def obfuscate_token(clear_token):
+    key = 123
+    try:
+        return "".join(chr(ord(c) ^ key) for c in clear_token)
+    except TypeError:
+        return ""
+
 def deobfuscate_token(obfuscated_token):
-    """Deobfuscates the API token."""
-    # Your deobfuscation logic here (example: simple XOR)
-    key = 123  # Replace with your actual key
+    key = 123
     try:
         return "".join(chr(ord(c) ^ key) for c in obfuscated_token)
     except TypeError:
-        return ""  # Return empty on error
+        return ""

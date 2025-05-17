@@ -8,6 +8,7 @@ setup(
         "PyQt6",
         "qt_material",
         "huggingface_hub",
-        "requests",  # Added requests
+        "requests",
+        "keyring",
     ],
 )

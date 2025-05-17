@@ -1,0 +1,5 @@
+PyQt6
+qt_material
+huggingface_hub
+requests
+keyring
