@@ -143,18 +143,14 @@ Before using the tool, you need to configure it with your Hugging Face API token
 
 > This section lists some of the known limitations and areas for improvement.
 
-*   **Single File Upload (Currently):** The tool currently only supports uploading *one* file at a time.
-*   **Output Logging:**  Output and progress updates may currently be visible only in the terminal logs.
-*   **Repository Creation (Potential Issues):**  Creating a new repository might still have issues.  It's generally recommended to pre-create your repositories on the Hugging Face Hub.
 *   **Spacing and UI Glitches:**  There might still be some spacing or UI layout issues.
-*   **Multiple File Upload:** The GUI doesn't support multiple file uploads yet.
-*   **macOS Development Challenges:** Developing on macOS can be tricky (as you noted!).
+*   **General Code Challenges:** Developing on macOS can be tricky, and there are still some things we're going to work on in future.
 
 ## 6. Usage
 
 Here's how to use the Hugging Face Backup Tool:
 
-**Steps:**
+**Steps for the Uploader:**
 
 1.  **Select a Directory:**  Click the "Select Directory" button, and choose the directory containing the files you want to back up.
 2.  **Choose a File Type:**  Use the "File Type" dropdown to select the type of files you want to upload (e.g., SafeTensors, PyTorch Models).
@@ -162,6 +158,11 @@ Here's how to use the Hugging Face Backup Tool:
 4.  **Enter Repository Information:**  Fill in the "Owner" (your organization or username) and "Repository" name.
 5.  **Click "Upload":** Start the upload process.
 6.  **Check Output:** Check the output window in the GUI for progress updates.
+
+**Steps for the Zip Folder:**
+
+
+**Steps for the Downloader:**
 
 ## 7. Contributing
 
@@ -175,3 +176,10 @@ Contributions are very welcome! If you'd like to contribute, please:
 This project is licensed under the GNU General Public License v3.0.  See the [LICENSE](https://github.com/Ktiseos-Nyx/Huggingface-Desktop#GPL-3.0-1-ov-file) file for details.
 
 > **GNU General Public License v3.0:** ([https://www.gnu.org/licenses/gpl-3.0.en.html](https://www.gnu.org/licenses/gpl-3.0.en.html)).
+
+## 9. Future Plans
+
+1. Looking to refactor again later on and add "support" for easy tabbable plugins, like a metadata reader.
+2. Porting this to gradio for an easier online use.
+3. Refactoring the original Jupyter to have similar features. 
+
