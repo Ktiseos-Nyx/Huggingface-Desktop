@@ -1,7 +1,9 @@
 [![Made with Python](https://img.shields.io/badge/Python->=3.10-blue?logo=python&logoColor=white)](https://python.org "Go to Python homepage") 
 # Hugging Face Backup Tool
 
-A user-friendly desktop application for backing up your Hugging Face models, datasets, and spaces.
+A user-friendly desktop application for backing up your Hugging Face models, datasets, and spaces. Originally developed as a long standing Jupyter notebook for ease of use for everyone. 
+
+[Access the original Notebook here!](https://github.com/Ktiseos-Nyx/HuggingFace_Backup)
 
 [Connect with us on Discord](https://discord.gg/MASBKnNFWh)
 
